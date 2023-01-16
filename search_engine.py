@@ -1,6 +1,6 @@
 from os import listdir
 
-#create a tf_indice for every document in the given folder
+#create a tf_indice for every document in the given folder.
 def calc_term_frequency(folder_path):
     tf_db = {}
     folder_content = listdir(folder_path)

@@ -3,12 +3,13 @@ from search_engine import calc_term_frequency
 
 app = Flask(__name__)
 
+#index
 @app.route("/")
 def index():
     global tf_db
     tf_db = calc_term_frequency("cran_doc_collection")
     return render_template("index.html",  tf_db = tf_db)
-
+#after searching
 @app.route('/search', methods = ["GET", "POST"])
 def search():
     query = request.args.get("query")
