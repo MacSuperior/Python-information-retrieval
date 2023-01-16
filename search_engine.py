@@ -1,4 +1,6 @@
+from ast import arg
 from os import listdir
+import csv
 
 #create a tf_indice for every document in the given folder.
 def calc_term_frequency(folder_path):
@@ -15,3 +17,43 @@ def calc_term_frequency(folder_path):
                     else:
                         tf_db[file].update({word:1})
     return tf_db
+
+print(calc_term_frequency("cran_doc_collection"))
+
+#returns all documents for a single word boolean query
+def results(query,incidenceMatrix="recepten_incidence.csv"):
+    vectorList = []
+    relDocs = []
+    with open (f"csv_files/{incidenceMatrix}", "r") as f:
+        matrix = csv.reader(f)
+        matrix = list(matrix)
+        for row in matrix[1:]:
+            if row[0] in query:
+                print(row)
+                rowVector = [int(a) for a in row[1:]]
+                vectorList.append(rowVector)
+    for ind, colVector in enumerate(zip(*vectorList)):
+        if 0 in colVector:
+            print(ind, colVector, "dit wordt niet geappend")
+        else:
+            print(ind, colVector, "dit wel")
+            relDocs.append(matrix[0][ind + 1])
+    return vectorList, relDocs
+
+def to_csv(tf_db):
+    #woops! it has to be a csv file so lets convert that bby!
+    with open("tf_csv.csv", "w", newline = "") as csvfile:
+        fieldnames = []
+        fieldnames.append(tf_db.keys())
+        for k, v, in tf_db.items():
+            if isinstance(v, dict):
+                fieldnames.append(v.keys())
+            else:
+                pass
+        writer = csv.writer(csvfile)
+        for word in fieldnames:
+            writer.writerow(word)
+    
+
+
+query = ["appel", "gaar"]
