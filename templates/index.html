@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search here</title>
+</head>
+<body>
+    <h1>Search engine</h1>
+    <form action = "search">
+        <input type = "text" name = "query" id = "query">
+        <input type = "submit">
+    </form>
+    {% if query %}
+    <p>Showing results for {{ query }}</p>
+    {% endif %}
+
+<p>here is a term frequency indice:</p>
+<p>{{ tf_db }}</p>
+
+</body>
+</html>
