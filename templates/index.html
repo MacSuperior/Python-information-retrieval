@@ -8,16 +8,16 @@
 </head>
 <body>
     <h1>Search engine</h1>
+    <p>Search in english, boolean AND query: </p>
+    <p>try some searches! "effect of roughness on transition", "isothermal plate", "propeller"</p>
     <form action = "search">
         <input type = "text" name = "query" id = "query">
         <input type = "submit">
     </form>
     {% if query %}
-    <p>Showing results for {{ query }}:</p>
+    <p>Showing results for <b>{{ query }}</b>:</p>
+    <p>The relevant documents are: {{ q_res }}</p>
     {% endif %}
-
-<p>here is a term frequency indice:</p>
-<p>{{ tf_db }}</p>
 
 </body>
 </html>

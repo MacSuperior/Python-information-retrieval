@@ -18,17 +18,17 @@ def calc_term_frequency(folder_path="cran_doc_collection"):
                         tf_db[file].update({word:1})
     return tf_db
 
-#returns all documents for a single word boolean query
-query = ["appel", "gaar"] #test query
-def results(query: list,incidenceMatrix="recepten_incidence.csv"):
+#performs a boolean AND query and returns all relevant documents
+def results(query,incidenceMatrix="csv_files/term_incidence.csv"):
     vectorList = []
     relDocs = []
-    with open (f"csv_files/{incidenceMatrix}", "r") as f:
+    query = query.split()
+    print("query inside func", query)
+    with open (incidenceMatrix, "r") as f:
         matrix = csv.reader(f)
         matrix = list(matrix)
         for row in matrix[1:]:
             if row[0] in query:
-                print(row)
                 rowVector = [int(a) for a in row[1:]] #get all indices from rurrent row
                 vectorList.append(rowVector)
     for ind, colVector in enumerate(zip(*vectorList)):
@@ -38,9 +38,7 @@ def results(query: list,incidenceMatrix="recepten_incidence.csv"):
             relDocs.append(matrix[0][ind + 1])
     return relDocs    
 
-#TODO: fill matrix with 1 if document has occurence of the word, else fill in 0
-
-def create_csv(file_location="csv_files/term_indice2.csv"):
+def create_csv(file_location="csv_files/term_incidence.csv"):
     calc_term_frequency() #necessary to get $tf_db
     headers = [""]
     terms = []
@@ -69,7 +67,4 @@ def create_csv(file_location="csv_files/term_indice2.csv"):
         writer = csv.writer(csvfile)
         writer.writerow(headers)
         writer.writerows(terms) 
-    
-    return terms
-
-print(create_csv())
+    return

@@ -1,19 +1,23 @@
 from flask import Flask, render_template, request
-from search_engine import calc_term_frequency
+from search_engine import calc_term_frequency, results, create_csv
 
 app = Flask(__name__)
+
+tf_db = calc_term_frequency()
 
 #index
 @app.route("/")
 def index():
-    global tf_db
-    tf_db = calc_term_frequency("cran_doc_collection")
     return render_template("index.html",  tf_db = tf_db)
+
 #after searching
 @app.route('/search', methods = ["GET", "POST"])
 def search():
     query = request.args.get("query")
-    return render_template('index.html', query = query, tf_db = tf_db)
+    print("query:", query)
+    q_res = results(query)
+    print("q_res:", q_res)
+    return render_template('index.html', query = query, q_res = q_res)
 
 if __name__ == "__main__":
     app.config['TEMPLATES_AUTO_RELOAD']=True
