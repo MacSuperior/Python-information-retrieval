@@ -36,30 +36,40 @@ def results(query: list,incidenceMatrix="recepten_incidence.csv"):
             pass
         else:
             relDocs.append(matrix[0][ind + 1])
-    return vectorList, relDocs    
+    return relDocs    
 
-#TODO: create column for every document and rows for all words in tf_db in a csv file
+#TODO: fill matrix with 1 if document has occurence of the word, else fill in 0
+
 def create_csv(file_location="csv_files/term_indice2.csv"):
-    calc_term_frequency()
+    calc_term_frequency() #necessary to get tf_db
     headers = [""]
     terms = []
+    new = []
     #create headers list consisting of all document names
     for doc in tf_db.keys():
         headers.append(doc)
 
-    #write row to $file_location for every individual word in dataset
-    #TODO it should not seperates every letter with a comma, but it does
+    #terms list
+    for k, v in tf_db.items():
+            v = v.keys()
+            for term in v:
+                terms.append([term])
+
+    #create word + an indice for each document 
+    for i, word in enumerate(terms):
+        word = terms[i][0] #word needs to be type string to check its' presence   
+        for docName in headers[1:]:
+            if word in tf_db[docName].keys():
+                terms[i].append(1)
+            else:
+                terms[i].append(0)
+    return terms
+    #write to $file_location
     with open(file_location, "w") as csvfile:
         writer = csv.writer(csvfile)
         writer.writerow(headers)
-        for k, v in tf_db.items():
-            v = v.keys()
-            for term in v:
-                terms.append(term)
-            print(k,"\n", v)
-        writer.writerows(terms)
-    return headers, terms
-
-#TODO: fill matrix with 1 if document has occurence of the word, else fill in 0
+        writer.writerows([terms]) #wrap term with list to prevent words seperated by commas
+    
+    return terms
 
 print(create_csv())
