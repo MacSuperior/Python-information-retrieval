@@ -41,10 +41,10 @@ def results(query: list,incidenceMatrix="recepten_incidence.csv"):
 #TODO: fill matrix with 1 if document has occurence of the word, else fill in 0
 
 def create_csv(file_location="csv_files/term_indice2.csv"):
-    calc_term_frequency() #necessary to get tf_db
+    calc_term_frequency() #necessary to get $tf_db
     headers = [""]
     terms = []
-    new = []
+
     #create headers list consisting of all document names
     for doc in tf_db.keys():
         headers.append(doc)
@@ -63,12 +63,12 @@ def create_csv(file_location="csv_files/term_indice2.csv"):
                 terms[i].append(1)
             else:
                 terms[i].append(0)
-    return terms
+
     #write to $file_location
     with open(file_location, "w") as csvfile:
         writer = csv.writer(csvfile)
         writer.writerow(headers)
-        writer.writerows([terms]) #wrap term with list to prevent words seperated by commas
+        writer.writerows(terms) 
     
     return terms
 
