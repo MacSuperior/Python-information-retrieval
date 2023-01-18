@@ -68,3 +68,23 @@ def create_csv(file_location="csv_files/term_incidence.csv"):
         writer.writerow(headers)
         writer.writerows(terms) 
     return
+
+#TODO write func that reads pagerank file and calculates pagerank for every file
+#TODO optional: create random pagerank file
+def calc_pagerank(pagerank_file = "pagerank.txt", damping=0.9):
+    pagerank_scores = {}
+    pagerank_data = {}
+    with open(pagerank_file, "r") as f:
+        for row in f:
+            row = row.split()
+            pagerank_scores.update({row[0]:1})
+            if len(row) == 1:
+                pagerank_data.update({row[0]:None})
+            else:
+                pagerank_data.update({row[0]:row[1:]})
+
+        for document in pagerank_scores:
+            #bereken pagerank voor document en voeg toe aan pagerank scores
+            pass
+                    
+    return pagerank_scores
