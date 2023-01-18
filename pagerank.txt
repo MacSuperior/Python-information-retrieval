@@ -1,0 +1,4 @@
+doc1.txt doc2.txt doc8.txt
+doc3.txt
+doc5.txt doc3.txt
+doc9.txt  doc10.txt doc1.txt
