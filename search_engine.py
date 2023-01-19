@@ -2,7 +2,7 @@ from os import listdir
 import csv
 
 #create a tf_indice for every document in the given folder.
-def calc_term_frequency(folderPath="cran_doc_collection"):
+def calc_term_frequency(folderPath="doc_collection"):
     global tf_db
     tf_db = {}
     folder_content = listdir(folderPath)
