@@ -1,9 +1,8 @@
 from flask import Flask, render_template, request
-from search_engine import calc_term_frequency, results, create_csv
-
+import search_engine
 app = Flask(__name__)
 
-tf_db = calc_term_frequency()
+tf_db = search_engine.calc_term_frequency()
 
 #index
 @app.route("/")
@@ -14,9 +13,7 @@ def index():
 @app.route('/search', methods = ["GET", "POST"])
 def search():
     query = request.args.get("query")
-    print("query:", query)
-    q_res = results(query)
-    print("q_res:", q_res)
+    q_res = search_engine.search_bool(query)
     return render_template('index.html', query = query, q_res = q_res)
 
 if __name__ == "__main__":
