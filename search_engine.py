@@ -18,7 +18,7 @@ def calc_term_frequency(folderPath="doc_collection"):
                         tf_db[file].update({word:1})
     return tf_db
 
-def create_csv(fileLocation="csv_files/term_incidence.csv"):
+def create_csv(fileLocation="database/term_incidence.csv"):
     calc_term_frequency() #necessary to get $tf_db
     headers = [""]
     terms = []
@@ -49,11 +49,11 @@ def create_csv(fileLocation="csv_files/term_incidence.csv"):
         writer.writerows(terms) 
     return
 
-#calculate pagerank for every file in $pagerank_file
-def calc_pageranks(pagerank_file = "pagerank_graph.txt", damping = 0.9, iterations = 100):
+#calculate pagerank for every file in $pagerankGraph
+def calc_pageranks(pagerankGraph = "database/pagerank_graph.txt", damping = 0.9, iterations = 100):
     pagerankScores = {}
     pagerankData = {} #dict of what files a file (the dict key) points to 
-    with open(pagerank_file, "r") as f:
+    with open(pagerankGraph, "r") as f:
         for row in f:
             row = row.split()
             pagerankScores.update({row[0]:1}) #set starting pagerank for documents
@@ -80,15 +80,15 @@ def calc_pageranks(pagerank_file = "pagerank_graph.txt", damping = 0.9, iteratio
     return pagerankScores
 
 #write pagerank to file
-def write_pagerank(pagerankScores):
-    with open("pagerank_scores.txt", "w") as f:
+def write_pagerank(pagerankScores, fileLocation = "database/pagerank_scores.txt"):
+    with open(fileLocation, "w") as f:
         for k, v, in pagerankScores.items():
             f.write(f"{k} {v}\n")
 
 #TODO optional: create (random) pagerank file
 
 #performs a boolean AND query and returns all relevant documents
-def search_bool(query,incidenceMatrix="csv_files/term_incidence.csv", pagerankScores = "pagerank_scores.txt"):
+def search_bool(query,incidenceMatrix="database/term_incidence.csv", pagerankScores = "database/pagerank_scores.txt"):
     vectorList = []
     relDocs = []
     result = {}
