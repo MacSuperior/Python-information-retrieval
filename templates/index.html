@@ -16,7 +16,15 @@
     </form>
     {% if query %}
     <p>Showing results for <b>{{ query }}</b>:</p>
-    <p>The relevant documents are: {{ q_res }}</p>
+    <div class = "q_bool">
+        <h2>Results: Boolean + pagerank model</h2>
+        <p>The relevant documents are: {{ q_res }}</p>
+    </div>
+    <div class = "q_tf-idf">
+        <h2>tf-idf query</h2>
+        <p>The relevant documents are: {{ q_res }}</p>
+    </div>
+
     {% endif %}
 
 </body>
