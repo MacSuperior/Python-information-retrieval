@@ -111,5 +111,5 @@ def search_bool(query,incidenceMatrix="database/term_incidence.csv", pagerankSco
             row = row.split()
             if row[0] in relDocs:
                 result.update({row[0]:row[1]})
-        result = sorted(result.values())
+        result = {key: val for key, val in sorted(result.items(), key = lambda ele: ele[1], reverse=True)}
     return result
