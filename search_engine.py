@@ -96,5 +96,4 @@ def calc_pageranks(pagerank_file = "pagerank.txt", damping = 0.9, iterations = 1
                         pass
                 pagerank = (1 - damping) + damping * temp
                 pagerankScores.update({docName:pagerank})
-
-    return pagerankScores, pagerankData
+    return pagerankScores
