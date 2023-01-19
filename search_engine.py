@@ -38,7 +38,7 @@ def results(query,incidenceMatrix="csv_files/term_incidence.csv"):
             relDocs.append(matrix[0][ind + 1])
     return relDocs    
 
-def create_csv(file_location="csv_files/term_incidence.csv"):
+def create_csv(fileLocation="csv_files/term_incidence.csv"):
     calc_term_frequency() #necessary to get $tf_db
     headers = [""]
     terms = []
@@ -63,8 +63,37 @@ def create_csv(file_location="csv_files/term_incidence.csv"):
                 terms[i].append(0)
 
     #write to $file_location
-    with open(file_location, "w") as csvfile:
+    with open(fileLocation, "w") as csvfile:
         writer = csv.writer(csvfile)
         writer.writerow(headers)
         writer.writerows(terms) 
     return
+
+#TODO optional: create (random) pagerank file
+def calc_pageranks(pagerank_file = "pagerank.txt", damping = 0.9, iterations = 100):
+    pagerankScores = {}
+    pagerankData = {} #dict of what files a file (the dict key) points to 
+    with open(pagerank_file, "r") as f:
+        for row in f:
+            row = row.split()
+            pagerankScores.update({row[0]:1}) #set starting pagerank for documents
+            if len(row) == 1:
+                pagerankData.update({row[0]:None})
+            else:
+                pagerankData.update({row[0]:row[1:]}) #pagerank graph
+    for i in range(iterations):
+        for docName in pagerankData:
+            pagerank = pagerankScores[docName]
+            temp = 0
+            for val in pagerankData.values():
+                if val == None:
+                    pass
+                else:
+                    if type(val) == list:
+                        if docName in val:
+                            temp += pagerank / len(val)
+                    else:
+                        pass
+                pagerank = (1 - damping) + damping * temp
+                pagerankScores.update({docName:pagerank})
+    return pagerankScores
