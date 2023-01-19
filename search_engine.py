@@ -2,13 +2,13 @@ from os import listdir
 import csv
 
 #create a tf_indice for every document in the given folder.
-def calc_term_frequency(folder_path="cran_doc_collection"):
+def calc_term_frequency(folderPath="cran_doc_collection"):
     global tf_db
     tf_db = {}
-    folder_content = listdir(folder_path)
+    folder_content = listdir(folderPath)
     for file in folder_content:
         tf_db.update({file:{}})
-        with open(f"{folder_path}/{file}", "r") as doc:
+        with open(f"{folderPath}/{file}", "r") as doc:
             for line in doc:
                 for word in line.split():
                     word = word.lower()
@@ -69,8 +69,8 @@ def create_csv(fileLocation="csv_files/term_incidence.csv"):
         writer.writerows(terms) 
     return
 
-#TODO optional: create (random) pagerank file
-def calc_pageranks(pagerank_file = "pagerank.txt", damping = 0.9, iterations = 100):
+#calculate pagerank for every file in $pagerank_file
+def calc_pageranks(pagerank_file = "pagerank_graph.txt", damping = 0.9, iterations = 100):
     pagerankScores = {}
     pagerankData = {} #dict of what files a file (the dict key) points to 
     with open(pagerank_file, "r") as f:
@@ -96,4 +96,13 @@ def calc_pageranks(pagerank_file = "pagerank.txt", damping = 0.9, iterations = 1
                         pass
                 pagerank = (1 - damping) + damping * temp
                 pagerankScores.update({docName:pagerank})
+    write_pagerank(pagerankScores)
     return pagerankScores
+
+#write pagerank to file
+def write_pagerank(pagerankScores):
+    with open("pagerank_scores.txt", "w") as f:
+        for k, v, in pagerankScores.items():
+            f.write(f"{k} {v}\n")
+
+#TODO optional: create (random) pagerank file
