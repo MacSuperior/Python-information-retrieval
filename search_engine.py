@@ -114,4 +114,4 @@ def search_bool(query,incidenceMatrix="csv_files/term_incidence.csv", pagerankSc
     return result
 
     # test voor github 19-01-2023, groetjes Rijk
-    # nog een test, voor directe commit push
+    # nog een test, voor directe commit push naar Liam
