@@ -5,6 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Search here</title>
+    <link rel = "stylesheet" type="text/css" href="{{url_for('.static', filename='style.css')}}">
 </head>
 <body>
     <h1>Search engine</h1>
@@ -16,7 +17,27 @@
     </form>
     {% if query %}
     <p>Showing results for <b>{{ query }}</b>:</p>
-    <p>The relevant documents are: {{ q_res }}</p>
+    <div class = "q_bool">
+        <h2>Results: Boolean + pagerank model</h2>        
+        <p>The relevant documents are:</p>
+        <table class = "bool-results">
+            <tr>
+                <th>Document</th>
+                <th>PageRank Value</th>
+            </tr>
+            {% for doc, pr in q_res.items() %}
+            <tr>
+                <td>{{ doc }}</td>
+                <td>{{ pr }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div class = "q_tf-idf">
+        <h2>tf-idf query</h2>
+        <p>The relevant documents are: {{ q_res }}</p>
+    </div>
+
     {% endif %}
 
 </body>
