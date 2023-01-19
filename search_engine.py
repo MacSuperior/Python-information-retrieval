@@ -18,26 +18,6 @@ def calc_term_frequency(folderPath="cran_doc_collection"):
                         tf_db[file].update({word:1})
     return tf_db
 
-#performs a boolean AND query and returns all relevant documents
-def results(query,incidenceMatrix="csv_files/term_incidence.csv"):
-    vectorList = []
-    relDocs = []
-    query = query.split()
-    print("query inside func", query)
-    with open (incidenceMatrix, "r") as f:
-        matrix = csv.reader(f)
-        matrix = list(matrix)
-        for row in matrix[1:]:
-            if row[0] in query:
-                rowVector = [int(a) for a in row[1:]] #get all indices from rurrent row
-                vectorList.append(rowVector)
-    for ind, colVector in enumerate(zip(*vectorList)):
-        if 0 in colVector:
-            pass
-        else:
-            relDocs.append(matrix[0][ind + 1])
-    return relDocs    
-
 def create_csv(fileLocation="csv_files/term_incidence.csv"):
     calc_term_frequency() #necessary to get $tf_db
     headers = [""]
@@ -106,3 +86,29 @@ def write_pagerank(pagerankScores):
             f.write(f"{k} {v}\n")
 
 #TODO optional: create (random) pagerank file
+
+#performs a boolean AND query and returns all relevant documents
+def search_bool(query,incidenceMatrix="csv_files/term_incidence.csv", pagerankScores = "pagerank_scores.txt"):
+    vectorList = []
+    relDocs = []
+    result = {}
+    query = query.split()
+    with open (incidenceMatrix, "r") as f:
+        matrix = csv.reader(f)
+        matrix = list(matrix)
+        for row in matrix[1:]:
+            if row[0] in query:
+                rowVector = [int(a) for a in row[1:]] #get all indices from rurrent row
+                vectorList.append(rowVector)
+    for ind, colVector in enumerate(zip(*vectorList)):
+        if 0 in colVector:
+            pass
+        else:
+            relDocs.append(matrix[0][ind + 1])
+    
+    with open(pagerankScores, "r") as f:
+        for row in f:
+            row = row.split()
+            if row[0] in relDocs:
+                result.update({row[0]:row[1]})
+    return result
