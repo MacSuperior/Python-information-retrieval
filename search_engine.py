@@ -1,5 +1,8 @@
 from os import listdir
 import csv
+import spacy
+nlp = spacy.load('en_core_web_sm')
+
 
 #create a tf_indice for every document in the given folder.
 def calc_term_frequency(folderPath="doc_collection"):
@@ -113,3 +116,20 @@ def search_bool(query,incidenceMatrix="database/term_incidence.csv", pagerankSco
                 result.update({row[0]:row[1]})
         result = {key: val for key, val in sorted(result.items(), key = lambda ele: ele[1], reverse=True)}
     return result
+
+#run once to set up database
+def initialize():
+    calc_pageranks()
+    create_csv()
+    calc_term_frequency()
+
+def lemmatize():
+    for file in listdir("doc_collection"):
+        with open(f"doc_collection/{file}", "r") as f:
+            content = " ".join(f.read().splitlines())
+            doc = nlp(content)
+            newDocContent = " ".join([token.lemma_ for token in doc])
+            with open(f"database/lemmatized_{file}", "w") as lemFile:
+                lemFile.write(newDocContent)
+    return 
+lemmatize()
