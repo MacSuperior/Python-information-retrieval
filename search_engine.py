@@ -132,4 +132,3 @@ def lemmatize():
             with open(f"database/lemmatized_{file}", "w") as lemFile:
                 lemFile.write(newDocContent)
     return 
-lemmatize()
