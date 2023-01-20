@@ -23,7 +23,6 @@ It will retrieve them using two models:
 
 > These features are not implemented in the current system
 
-* the system can load an arbitrary document set, for example, all documents from a directory
 * it has a 'next' button for showing  more results
 * the user can indicate a minimum recommendation threshold (e.g., 0.6 or a level in the scale, i.e., high, medium, or low). Only the documents with a similarity equal to or bigger than the threshold are displayed in the results
 * some form of extra preprocessing is executed on the documents, e.g., stemming. If you choose this extension then the report should contain a comparison of the retrieval performance with and without the extension.
