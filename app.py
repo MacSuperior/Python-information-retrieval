@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request
 import search_engine
+
 app = Flask(__name__)
 
 tf_db = search_engine.calc_term_frequency()
@@ -7,6 +8,7 @@ tf_db = search_engine.calc_term_frequency()
 #index
 @app.route("/")
 def index():
+    search_engine.update_database()
     return render_template("index.html",  tf_db = tf_db)
 
 #after searching
