@@ -115,36 +115,44 @@ def search_bool(query,incidenceMatrix="database/term_incidence.csv", pagerankSco
     vectorList = []
     relDocs = []
     result = {}
-    query = lemmatize(query).split()
+    query = lemmatize(query)
+    query = query.split()
 
     #Create document incidence vectors
     with open (incidenceMatrix, "r") as f:
-        matrix = list(csv.reader(f))
+        matrix = csv.reader(f)
+        matrix = list(matrix)
         for row in matrix[1:]:
             if row[0] in query:
                 rowVector = [int(a) for a in row[1:]] #Get all indices from rurrent row
                 vectorList.append(rowVector)
-    for ind, colVector in enumerate(zip(*vectorList)):
+
+    for i, colVector in enumerate(zip(*vectorList)):
         if 0 in colVector:
             pass
         else:
-            relDocs.append(matrix[0][ind + 1])
+            relDocs.append(matrix[0][i + 1])
+            print(relDocs)
 
     #Rank relevant documents
     with open(pagerankScores, "r") as f:
         for row in f:
+            print(row)
             row = row.split()
-            if row[0] in relDocs:
+            print(row)
+            if f"lemmatized_{row[0]}" in relDocs:
                 result.update({row[0]:row[1]})
+            print(result)
         result = {key: val for key, val in sorted(result.items(), key = lambda ele: ele[1], reverse=True)}
+    print(result)
     return result
 
 def update_database():
+    print("database updated")
     lemmatize_docs()
     calc_term_frequency()
     calc_indice_matrix() #depends on $tf_db
     calc_pageranks()
-
 
 # THIS HAS TO HAPPEN ONLY ONCE, BUT ALSO WHEN DOC_COLLECION IS UPDATED
 #1. lemmatize every doc in collection
