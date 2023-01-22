@@ -1,9 +1,9 @@
 from os import listdir
 import csv
 import spacy
+nlp = spacy.load('en_core_web_sm')
 
 def lemmatize(input):
-    nlp = spacy.load('en_core_web_sm')
     query = nlp(input)
     Lemquery = " ".join([token.lemma_ for token in query])
     return Lemquery
@@ -132,19 +132,14 @@ def search_bool(query,incidenceMatrix="database/term_incidence.csv", pagerankSco
             pass
         else:
             relDocs.append(matrix[0][i + 1])
-            print(relDocs)
 
     #Rank relevant documents
     with open(pagerankScores, "r") as f:
         for row in f:
-            print(row)
             row = row.split()
-            print(row)
             if f"lemmatized_{row[0]}" in relDocs:
                 result.update({row[0]:row[1]})
-            print(result)
         result = {key: val for key, val in sorted(result.items(), key = lambda ele: ele[1], reverse=True)}
-    print(result)
     return result
 
 def update_database():
