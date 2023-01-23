@@ -1,0 +1,11 @@
+table {
+    border: 1px solid;
+}
+
+.q_bool {
+    float: left;
+}
+
+.q_tf-idf {
+    float: right;
+}

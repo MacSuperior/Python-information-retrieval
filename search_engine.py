@@ -1,70 +1,93 @@
 from os import listdir
 import csv
+import spacy
+nlp = spacy.load('en_core_web_sm')
 
-#create a tf_indice for every document in the given folder.
-def calc_term_frequency(folderPath="doc_collection"):
+def lemmatize(input):
+    query = nlp(input)
+    Lemquery = " ".join([token.lemma_ for token in query])
+    return Lemquery
+
+#Lemmatize documents for use in all other functions
+def lemmatize_docs(doc_folder="doc_collection"):
+    for file in listdir(doc_folder):
+        with open(f"doc_collection/{file}", "r") as f:
+            content = " ".join(f.read().splitlines())
+            lemContent = lemmatize(content)
+            with open(f"database/lemmatized_{file}", "w") as lemFile:
+                lemFile.write(lemContent)
+    return
+
+#Create a tf_indice for every document in the given folder.
+def calc_term_frequency(folder="database"):
     global tf_db
     tf_db = {}
-    folder_content = listdir(folderPath)
-    for file in folder_content:
-        tf_db.update({file:{}})
-        with open(f"{folderPath}/{file}", "r") as doc:
-            for line in doc:
-                for word in line.split():
-                    word = word.lower()
-                    if word in tf_db[file].keys():
-                        tf_db[file][word] += 1
-                    else:
-                        tf_db[file].update({word:1})
-    return tf_db
+    
+    for file in listdir(folder):
+        if file.startswith("lemmatized_doc"):
+            tf_db.update({file:{}})
+            with open(f"{folder}/{file}", "r") as doc:
+                for line in doc:
+                    for word in line.split():
+                        word = word.lower()
+                        if word in tf_db[file].keys():
+                            tf_db[file][word] += 1
+                        else:
+                            tf_db[file].update({word:1})
+        else:
+            pass
+    return
 
-def create_csv(fileLocation="csv_files/term_incidence.csv"):
-    calc_term_frequency() #necessary to get $tf_db
+def calc_indice_matrix(fileLocation="database/term_incidence.csv"):
     headers = [""]
     terms = []
 
-    #create headers list consisting of all document names
+    #Create headers list of all document names
     for doc in tf_db.keys():
         headers.append(doc)
 
-    #terms list
+    #Create terms list
     for k, v in tf_db.items():
             v = v.keys()
             for term in v:
                 terms.append([term])
 
-    #create word + an indice for each document 
+    #Create word + an indice for each document 
     for i, word in enumerate(terms):
-        word = terms[i][0] #word needs to be type string to check its' presence   
+        word = terms[i][0] #Word needs to be type string to check its presence   
         for docName in headers[1:]:
             if word in tf_db[docName].keys():
                 terms[i].append(1)
             else:
                 terms[i].append(0)
 
-    #write to $file_location
+    #Write file indice matrix to $file_location
     with open(fileLocation, "w") as csvfile:
         writer = csv.writer(csvfile)
         writer.writerow(headers)
         writer.writerows(terms) 
-    return
+    return terms
 
-#calculate pagerank for every file in $pagerank_file
-def calc_pageranks(pagerank_file = "pagerank_graph.txt", damping = 0.9, iterations = 100):
+#Calculate pagerank for every file in $pagerankGraph
+def calc_pageranks(pagerankGraph = "database/pagerank_graph.txt", damping = 0.9, iterations = 100):
     pagerankScores = {}
-    pagerankData = {} #dict of what files a file (the dict key) points to 
-    with open(pagerank_file, "r") as f:
+    pagerankData = {} #Dict of what files a file (the dict key) points to
+
+    #Store pagerank graph
+    with open(pagerankGraph, "r") as f:
         for row in f:
             row = row.split()
-            pagerankScores.update({row[0]:1}) #set starting pagerank for documents
+            pagerankScores.update({row[0]:1}) #Set starting pagerank for documents
             if len(row) == 1:
                 pagerankData.update({row[0]:None})
             else:
-                pagerankData.update({row[0]:row[1:]}) #pagerank graph
+                pagerankData.update({row[0]:row[1:]}) #Pagerank graph
+
     for i in range(iterations):
         for docName in pagerankData:
             pagerank = pagerankScores[docName]
             temp = 0
+
             for val in pagerankData.values():
                 if val == None:
                     pass
@@ -76,42 +99,66 @@ def calc_pageranks(pagerank_file = "pagerank_graph.txt", damping = 0.9, iteratio
                         pass
                 pagerank = (1 - damping) + damping * temp
                 pagerankScores.update({docName:pagerank})
+
     write_pagerank(pagerankScores)
     return pagerankScores
 
-#write pagerank to file
-def write_pagerank(pagerankScores):
-    with open("pagerank_scores.txt", "w") as f:
+#Write file pageranks to file
+def write_pagerank(pagerankScores, fileLocation = "database/pagerank_scores.txt"):
+    with open(fileLocation, "w") as f:
         for k, v, in pagerankScores.items():
             f.write(f"{k} {v}\n")
 
-#TODO optional: create (random) pagerank file
-
-#performs a boolean AND query and returns all relevant documents
-def search_bool(query,incidenceMatrix="csv_files/term_incidence.csv", pagerankScores = "pagerank_scores.txt"):
+#TODO Optional: create (random) pagerank file
+#Performs a boolean AND query and returns all relevant documents
+def search_bool(query,incidenceMatrix="database/term_incidence.csv", pagerankScores = "database/pagerank_scores.txt"):
     vectorList = []
     relDocs = []
     result = {}
+    query = lemmatize(query)
     query = query.split()
+
+    #Create document incidence vectors
     with open (incidenceMatrix, "r") as f:
         matrix = csv.reader(f)
         matrix = list(matrix)
         for row in matrix[1:]:
             if row[0] in query:
-                rowVector = [int(a) for a in row[1:]] #get all indices from rurrent row
+                rowVector = [int(a) for a in row[1:]] #Get all indices from rurrent row
                 vectorList.append(rowVector)
-    for ind, colVector in enumerate(zip(*vectorList)):
+
+    for i, colVector in enumerate(zip(*vectorList)):
         if 0 in colVector:
             pass
         else:
-            relDocs.append(matrix[0][ind + 1])
-    
+            relDocs.append(matrix[0][i + 1])
+
+    #Rank relevant documents
     with open(pagerankScores, "r") as f:
         for row in f:
             row = row.split()
-            if row[0] in relDocs:
+            if f"lemmatized_{row[0]}" in relDocs:
                 result.update({row[0]:row[1]})
+        result = {key: val for key, val in sorted(result.items(), key = lambda ele: ele[1], reverse=True)}
     return result
 
-    # test voor github 19-01-2023, groetjes Rijk
-    # nog een test, voor directe commit push naar Liam
+def update_database():
+    print("database updated")
+    lemmatize_docs()
+    calc_term_frequency()
+    calc_indice_matrix() #depends on $tf_db
+    calc_pageranks()
+
+# THIS HAS TO HAPPEN ONLY ONCE, BUT ALSO WHEN DOC_COLLECION IS UPDATED
+#1. lemmatize every doc in collection
+#2. create term frequency DB
+#3. create term incidence csv
+#4 create pagerank scores
+#5 create term frequency csv
+#6 create term weight matrix csv
+
+#THIS HAS TO HAPPEN FOR EVERY SEARCH QUERY
+#1. lemmatize query
+#2. search with boolean boolean model and order by pagerank
+#3. search with tf-idf model and order by cosine similarity
+#4. show ranked outputs
