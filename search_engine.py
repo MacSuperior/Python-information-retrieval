@@ -215,3 +215,10 @@ def calc_tf_idf(doc_folder="database"):
         else:
             pass
 
+    #calculate term weight for all terms
+    global term_weight_db
+    term_weight_db = {}
+    for term in idf_db:
+            weight = idf_db[term] * tf_db_weights[term]
+            term_weight_db.update({term:weight})
+
