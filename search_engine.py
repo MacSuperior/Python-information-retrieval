@@ -143,11 +143,11 @@ def search_bool(query,incidenceMatrix="database/term_incidence.csv", pagerankSco
     return result
 
 def update_database():
-    print("database updated")
     lemmatize_docs()
     calc_term_frequency()
     calc_indice_matrix() #depends on $tf_db
     calc_pageranks()
+    print("database updated")
 
 # THIS HAS TO HAPPEN ONLY ONCE, BUT ALSO WHEN DOC_COLLECION IS UPDATED
 #1. lemmatize every doc in collection
@@ -162,3 +162,29 @@ def update_database():
 #2. search with boolean boolean model and order by pagerank
 #3. search with tf-idf model and order by cosine similarity
 #4. show ranked outputs
+
+#calculate document frequency for all terms
+def calc_df(doc_folder="database"):
+    global df_db
+    df_db = {}
+
+    #list all unique words in files
+    for file in listdir(doc_folder):
+        if file.startswith("lemmatized_doc"):
+            with open(f"{doc_folder}/{file}", "r") as doc:
+                for line in doc:
+                    for word in line.split():
+                        word = word.lower()
+                        df_db.update({word:0})
+        else:
+            pass
+
+    #count document frequencies
+    for term in df_db:
+        for file in listdir(doc_folder):
+            if file.startswith("lemmatized_doc"):
+                with open(f"{doc_folder}/{file}", "r") as doc:
+                    if term in doc.read():
+                        df_db[term] += 1
+            else:
+                pass
