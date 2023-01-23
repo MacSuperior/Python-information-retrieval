@@ -15,8 +15,8 @@ def index():
 @app.route('/search', methods = ["GET", "POST"])
 def search():
     query = request.args.get("query")
-    q_res = search_engine.search_bool(query)
-    return render_template('index.html', query = query, q_res = q_res)
+    q_res, preview = search_engine.search_bool(query)
+    return render_template('index.html', query = query, q_res = q_res, preview = preview)
 
 if __name__ == "__main__":
     app.config['TEMPLATES_AUTO_RELOAD']=True
