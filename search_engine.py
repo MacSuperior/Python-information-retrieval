@@ -1,6 +1,7 @@
 from os import listdir
 import csv
 import spacy
+import math
 nlp = spacy.load('en_core_web_sm')
 
 def lemmatize(input):
@@ -163,12 +164,13 @@ def update_database():
 #3. search with tf-idf model and order by cosine similarity
 #4. show ranked outputs
 
-#calculate document frequency for all terms
-def calc_df(doc_folder="database"):
+#calculate tf-idf model
+def calc_tf_idf(doc_folder="database"):
+    #calculate document frequency for all terms
     global df_db
     df_db = {}
 
-    #list all unique words in files
+    #list all unique terms
     for file in listdir(doc_folder):
         if file.startswith("lemmatized_doc"):
             with open(f"{doc_folder}/{file}", "r") as doc:
@@ -188,3 +190,11 @@ def calc_df(doc_folder="database"):
                         df_db[term] += 1
             else:
                 pass
+
+    #convert into inverse document frequency
+    global idf_db
+    N = 10    #number of documents
+    idf_db = {}
+    for term in df_db:
+        idf_value = math.log2(N/df_db[term])
+        idf_db.update({term:idf_value})
