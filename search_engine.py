@@ -198,3 +198,20 @@ def calc_tf_idf(doc_folder="database"):
     for term in df_db:
         idf_value = math.log2(N/df_db[term])
         idf_db.update({term:idf_value})
+
+    #create term frequency dictionary
+    global tf_db_weights
+    tf_db_weights = {}
+    for file in listdir(doc_folder):
+        if file.startswith("lemmatized_doc"):
+            with open(f"{doc_folder}/{file}", "r") as doc:
+                for line in doc:
+                    for word in line.split():
+                        word = word.lower()
+                        if word in tf_db_weights:
+                            tf_db_weights[word] += 1
+                        else:
+                            tf_db_weights.update({word:1})
+        else:
+            pass
+
