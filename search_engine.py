@@ -2,6 +2,7 @@ from os import listdir
 import csv
 import spacy
 import math
+import random
 nlp = spacy.load('en_core_web_sm')
 
 def lemmatize(input):
@@ -222,3 +223,31 @@ def calc_tf_idf(doc_folder="database"):
             weight = idf_db[term] * tf_db_weights[term]
             term_weight_db.update({term:weight})
 
+
+def create_doc_collection():
+    docs = []
+    with open("database/cran_all_1400.txt") as f:
+        content = f.readlines()
+        for i, line in enumerate(content):
+            if line == ".W\n":
+                docs.append([])
+                for line in content[i+1:]:
+                    if line.startswith(".I") != True:
+                        docs[-1].append(line)
+                    else:
+                        break
+    fileNum = 1
+    for doc in docs:
+        with open(f"huge_doc_collection/doc{fileNum}.txt", "w") as f:
+            f.writelines(doc)
+        fileNum += 1
+    return
+
+def create_pagerank_graph():
+    with open("database/HDC_pagerank_graph.txt", "w") as f:
+        allFiles = listdir("huge_doc_collection")
+        for doc in allFiles:
+            line = f"{doc} {' '.join(random.choices(allFiles, k= random.randint(1, 6)))}"
+            f.write(f"{line}\n")
+
+create_pagerank_graph()
