@@ -152,7 +152,6 @@ def preview_document(query, result):
     for doc in result.keys():
         with open(f"doc_collection/{doc}") as f:
             content = f.readlines()
-            print(content)
             for line in content:
                 line = line.rstrip()
                 for x in query:
@@ -217,7 +216,6 @@ def calc_tf_idf(doc_folder="database"):
     for term in idf_db:
             weight = idf_db[term] * tf_db_weights[term]
             term_weight_db.update({term:weight})
-
 
 def create_doc_collection(createFiles = False):
     global lg_doc_collection
