@@ -5,6 +5,7 @@ import math
 import random
 nlp = spacy.load('en_core_web_sm')
 
+#lemmatize input
 def lemmatize(input):
     query = nlp(input)
     Lemquery = " ".join([token.lemma_ for token in query])
@@ -13,7 +14,7 @@ def lemmatize(input):
 #Lemmatize documents for use in all other functions
 def lemmatize_docs(doc_folder="doc_collection"):
     for file in listdir(doc_folder):
-        with open(f"doc_collection/{file}", "r") as f:
+        with open(f"{doc_folder}/{file}", "r") as f:
             content = " ".join(f.read().splitlines())
             lemContent = lemmatize(content)
             with open(f"database/lemmatized_{file}", "w") as lemFile:
@@ -144,27 +145,6 @@ def search_bool(query,incidenceMatrix="database/term_incidence.csv", pagerankSco
         result = {key: val for key, val in sorted(result.items(), key = lambda ele: ele[1], reverse=True)}
     return result
 
-def update_database():
-    lemmatize_docs()
-    calc_term_frequency()
-    calc_indice_matrix() #depends on $tf_db
-    calc_pageranks()
-    print("database updated")
-
-# THIS HAS TO HAPPEN ONLY ONCE, BUT ALSO WHEN DOC_COLLECION IS UPDATED
-#1. lemmatize every doc in collection
-#2. create term frequency DB
-#3. create term incidence csv
-#4 create pagerank scores
-#5 create term frequency csv
-#6 create term weight matrix csv
-
-#THIS HAS TO HAPPEN FOR EVERY SEARCH QUERY
-#1. lemmatize query
-#2. search with boolean boolean model and order by pagerank
-#3. search with tf-idf model and order by cosine similarity
-#4. show ranked outputs
-
 #calculate tf-idf model
 def calc_tf_idf(doc_folder="database"):
     #calculate document frequency for all terms
@@ -224,30 +204,56 @@ def calc_tf_idf(doc_folder="database"):
             term_weight_db.update({term:weight})
 
 
-def create_doc_collection():
-    docs = []
+def create_doc_collection(createFiles = False):
+    global lg_doc_collection
+    lg_doc_collection = []
     with open("database/cran_all_1400.txt") as f:
         content = f.readlines()
         for i, line in enumerate(content):
             if line == ".W\n":
-                docs.append([])
+                lg_doc_collection.append([])
                 for line in content[i+1:]:
                     if line.startswith(".I") != True:
-                        docs[-1].append(line)
+                        lg_doc_collection[-1].append(line)
                     else:
                         break
-    fileNum = 1
-    for doc in docs:
-        with open(f"huge_doc_collection/doc{fileNum}.txt", "w") as f:
-            f.writelines(doc)
-        fileNum += 1
+
+    #we dont want 1400 document files when we can search a list, maybe later remove code underneath
+    if createFiles == True:
+        fileNum = 1
+        for doc in lg_doc_collection:
+            with open(f"huge_doc_collection/doc{fileNum}.txt", "w") as f:
+                f.writelines(doc)
+            fileNum += 1
+    
     return
 
-def create_pagerank_graph():
-    with open("database/HDC_pagerank_graph.txt", "w") as f:
-        allFiles = listdir("huge_doc_collection")
+#create pagerank graph for specified document collection
+def create_pagerank_graph(fileName = "pagerank_graph.txt", docCollection="doc_collection"):
+    with open(f"database/{fileName}.txt", "w") as f:
+        allFiles = listdir(docCollection)
         for doc in allFiles:
             line = f"{doc} {' '.join(random.choices(allFiles, k= random.randint(1, 6)))}"
             f.write(f"{line}\n")
 
-create_pagerank_graph()
+def update_database():
+    lemmatize_docs()
+    calc_term_frequency()
+    calc_indice_matrix() #depends on $tf_db
+    create_pagerank_graph()
+    calc_pageranks()
+    print("database updated")
+# THIS HAS TO HAPPEN ONLY ONCE, BUT ALSO WHEN DOC_COLLECION IS UPDATED
+#1. lemmatize every doc in collection
+#2. create term frequency DB
+#3. create term incidence csv
+#4. create pagerank scores
+#5. create pagerank graph
+#6. create term frequency csv
+#7. create term weight matrix csv
+
+#THIS HAS TO HAPPEN FOR EVERY SEARCH QUERY
+#1. lemmatize query
+#2. search with boolean boolean model and order by pagerank
+#3. search with tf-idf model and order by cosine similarity
+#4. show ranked outputs
