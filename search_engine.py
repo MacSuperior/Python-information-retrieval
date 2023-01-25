@@ -1,8 +1,11 @@
 from os import listdir
 import csv
 import spacy
+import math
+import random
 nlp = spacy.load('en_core_web_sm')
 
+#lemmatize input
 def lemmatize(input):
     content = nlp(input)
     lemContent = " ".join([token.lemma_ for token in content])
@@ -11,7 +14,7 @@ def lemmatize(input):
 #Lemmatize documents for use in all other functions
 def lemmatize_docs(doc_folder="doc_collection"):
     for file in listdir(doc_folder):
-        with open(f"doc_collection/{file}", "r") as f:
+        with open(f"{doc_folder}/{file}", "r") as f:
             content = " ".join(f.read().splitlines())
             lemContent = lemmatize(content)
             with open(f"database/lemmatized_{file}", "w") as lemFile:
@@ -100,11 +103,11 @@ def calc_pageranks(pagerankGraph = "database/pagerank_graph.txt", damping = 0.9,
                 pagerank = (1 - damping) + damping * temp
                 pagerankScores.update({docName:pagerank})
 
-    write_pagerank(pagerankScores)
+    create_pagerank_file(pagerankScores)
     return pagerankScores
 
 #Write file pageranks to file
-def write_pagerank(pagerankScores, fileLocation = "database/pagerank_scores.txt"):
+def create_pagerank_file(pagerankScores, fileLocation = "database/pagerank_scores.txt"):
     with open(fileLocation, "w") as f:
         for k, v, in pagerankScores.items():
             f.write(f"{k} {v}\n")
@@ -157,20 +160,111 @@ def preview_document(query, result):
                         preview.update({doc:f"...{line}..."})
     return preview
 
+#calculate tf-idf model
+def calc_tf_idf(doc_folder="database"):
+    #calculate document frequency for all terms
+    global df_db
+    df_db = {}
+
+    #list all unique terms
+    for file in listdir(doc_folder):
+        if file.startswith("lemmatized_doc"):
+            with open(f"{doc_folder}/{file}", "r") as doc:
+                for line in doc:
+                    for word in line.split():
+                        word = word.lower()
+                        df_db.update({word:0})
+        else:
+            pass
+
+    #count document frequencies
+    for term in df_db:
+        for file in listdir(doc_folder):
+            if file.startswith("lemmatized_doc"):
+                with open(f"{doc_folder}/{file}", "r") as doc:
+                    if term in doc.read():
+                        df_db[term] += 1
+            else:
+                pass
+
+    #convert into inverse document frequency
+    global idf_db
+    N = 10    #number of documents
+    idf_db = {}
+    for term in df_db:
+        idf_value = math.log2(N/df_db[term])
+        idf_db.update({term:idf_value})
+
+    #create term frequency dictionary
+    global tf_db_weights
+    tf_db_weights = {}
+    for file in listdir(doc_folder):
+        if file.startswith("lemmatized_doc"):
+            with open(f"{doc_folder}/{file}", "r") as doc:
+                for line in doc:
+                    for word in line.split():
+                        word = word.lower()
+                        if word in tf_db_weights:
+                            tf_db_weights[word] += 1
+                        else:
+                            tf_db_weights.update({word:1})
+        else:
+            pass
+
+    #calculate term weight for all terms
+    global term_weight_db
+    term_weight_db = {}
+    for term in idf_db:
+            weight = idf_db[term] * tf_db_weights[term]
+            term_weight_db.update({term:weight})
+
+
+def create_doc_collection(createFiles = False):
+    global lg_doc_collection
+    lg_doc_collection = []
+    with open("database/cran_all_1400.txt") as f:
+        content = f.readlines()
+        for i, line in enumerate(content):
+            if line == ".W\n":
+                lg_doc_collection.append([])
+                for line in content[i+1:]:
+                    if line.startswith(".I") != True:
+                        lg_doc_collection[-1].append(line)
+                    else:
+                        break
+
+    #we dont want 1400 document files when we can search a list, maybe later remove code underneath
+    if createFiles == True:
+        fileNum = 1
+        for doc in lg_doc_collection:
+            with open(f"huge_doc_collection/doc{fileNum}.txt", "w") as f:
+                f.writelines(doc)
+            fileNum += 1
+    return
+
+#create pagerank graph for specified document collection
+def create_pagerank_graph(fileName = "pagerank_graph", docCollection="doc_collection"):
+    with open(f"database/{fileName}.txt", "w") as f:
+        allFiles = listdir(docCollection)
+        for doc in allFiles:
+            line = f"{doc} {' '.join(random.choices(allFiles, k= random.randint(1, 6)))}"
+            f.write(f"{line}\n")
+
 def update_database():
-    print("database updated")
     lemmatize_docs()
     calc_term_frequency()
     calc_indice_matrix() #depends on $tf_db
+    create_pagerank_graph()
     calc_pageranks()
-
+    print("database updated")
 # THIS HAS TO HAPPEN ONLY ONCE, BUT ALSO WHEN DOC_COLLECION IS UPDATED
 #1. lemmatize every doc in collection
 #2. create term frequency DB
 #3. create term incidence csv
-#4 create pagerank scores
-#5 create term frequency csv
-#6 create term weight matrix csv
+#4. create pagerank scores
+#5. create pagerank graph
+#6. create term frequency csv
+#7. create term weight matrix csv
 
 #THIS HAS TO HAPPEN FOR EVERY SEARCH QUERY
 #1. lemmatize query
