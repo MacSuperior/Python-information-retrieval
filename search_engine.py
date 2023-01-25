@@ -200,25 +200,24 @@ def calc_tf_idf(doc_folder="database"):
         idf_db.update({term:idf_value})
 
     #create term frequency dictionary
-    global tf_db_weights
-    tf_db_weights = {}
-    for file in listdir(doc_folder):
-        if file.startswith("lemmatized_doc"):
-            with open(f"{doc_folder}/{file}", "r") as doc:
-                for line in doc:
-                    for word in line.split():
-                        word = word.lower()
-                        if word in tf_db_weights:
-                            tf_db_weights[word] += 1
-                        else:
-                            tf_db_weights.update({word:1})
-        else:
-            pass
+    calc_term_frequency()
 
     #calculate term weight for all terms
     global term_weight_db
     term_weight_db = {}
-    for term in idf_db:
-            weight = idf_db[term] * tf_db_weights[term]
-            term_weight_db.update({term:weight})
+    for doc in tf_db:
+        term_weight_db.update({doc:{}})
+        for term in tf_db[doc]:
+            weight = idf_db[term] * tf_db[doc][term]
+            term_weight_db[doc].update({term:weight})
+
+    #create vector lenghts for all documents
+    global vector_lenghts_db
+    vector_lenghts_db = {}
+    for doc in term_weight_db:
+        x = 0
+        for term in term_weight_db[doc]:
+                x += term_weight_db[doc][term] ** 2
+        doc_lenght = math.sqrt(x)
+        vector_lenghts_db.update({doc:doc_lenght})
 
