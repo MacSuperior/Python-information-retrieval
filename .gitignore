@@ -2,4 +2,4 @@ __pycache__/
 .DS_Store
 database/term_incidence.csv
 database/pagerank*
-huge_doc_collection/
+huge_doc_collection/*
