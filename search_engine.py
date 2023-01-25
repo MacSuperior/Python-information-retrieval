@@ -103,11 +103,11 @@ def calc_pageranks(pagerankGraph = "database/pagerank_graph.txt", damping = 0.9,
                 pagerank = (1 - damping) + damping * temp
                 pagerankScores.update({docName:pagerank})
 
-    write_pagerank(pagerankScores)
+    create_pagerank_file(pagerankScores)
     return pagerankScores
 
 #Write file pageranks to file
-def write_pagerank(pagerankScores, fileLocation = "database/pagerank_scores.txt"):
+def create_pagerank_file(pagerankScores, fileLocation = "database/pagerank_scores.txt"):
     with open(fileLocation, "w") as f:
         for k, v, in pagerankScores.items():
             f.write(f"{k} {v}\n")
@@ -225,11 +225,10 @@ def create_doc_collection(createFiles = False):
             with open(f"huge_doc_collection/doc{fileNum}.txt", "w") as f:
                 f.writelines(doc)
             fileNum += 1
-    
     return
 
 #create pagerank graph for specified document collection
-def create_pagerank_graph(fileName = "pagerank_graph.txt", docCollection="doc_collection"):
+def create_pagerank_graph(fileName = "pagerank_graph", docCollection="doc_collection"):
     with open(f"database/{fileName}.txt", "w") as f:
         allFiles = listdir(docCollection)
         for doc in allFiles:
