@@ -9,7 +9,7 @@ tf_db = search_engine.calc_term_frequency()
 @app.route("/")
 def index():
     search_engine.update_database()
-    return render_template("index.html",  tf_db = tf_db)
+    return render_template("index.html")
 
 #after searching
 @app.route('/search', methods = ["GET", "POST"])
