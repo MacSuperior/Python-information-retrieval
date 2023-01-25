@@ -7,9 +7,9 @@ nlp = spacy.load('en_core_web_sm')
 
 #lemmatize input
 def lemmatize(input):
-    query = nlp(input)
-    Lemquery = " ".join([token.lemma_ for token in query])
-    return Lemquery
+    content = nlp(input)
+    lemContent = " ".join([token.lemma_ for token in content])
+    return lemContent
 
 #Lemmatize documents for use in all other functions
 def lemmatize_docs(doc_folder="doc_collection"):
@@ -118,8 +118,7 @@ def search_bool(query,incidenceMatrix="database/term_incidence.csv", pagerankSco
     vectorList = []
     relDocs = []
     result = {}
-    query = lemmatize(query)
-    query = query.split()
+    query = lemmatize(query).split()
 
     #Create document incidence vectors
     with open (incidenceMatrix, "r") as f:
@@ -143,7 +142,22 @@ def search_bool(query,incidenceMatrix="database/term_incidence.csv", pagerankSco
             if f"lemmatized_{row[0]}" in relDocs:
                 result.update({row[0]:row[1]})
         result = {key: val for key, val in sorted(result.items(), key = lambda ele: ele[1], reverse=True)}
-    return result
+        preview = preview_document(query, result)
+    return result, preview
+
+def preview_document(query, result):
+    print(f"query:{query}")
+    print(f"result:{result}")
+    preview = {}
+    for doc in result.keys():
+        with open(f"doc_collection/{doc}") as f:
+            content = f.readlines()
+            for line in content:
+                line = line.rstrip()
+                for x in query:
+                    if x in line:
+                        preview.update({doc:f"...{line}..."})
+    return preview
 
 #calculate tf-idf model
 def calc_tf_idf(doc_folder="database"):
@@ -202,7 +216,6 @@ def calc_tf_idf(doc_folder="database"):
     for term in idf_db:
             weight = idf_db[term] * tf_db_weights[term]
             term_weight_db.update({term:weight})
-
 
 def create_doc_collection(createFiles = False):
     global lg_doc_collection
