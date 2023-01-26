@@ -221,3 +221,23 @@ def calc_tf_idf(doc_folder="database"):
         doc_lenght = math.sqrt(x)
         vector_lenghts_db.update({doc:doc_lenght})
 
+#search relevant documents with tf-idf
+def search_tf_idf(query):
+    global relDocs
+    relDocs = {}
+    result = {}
+    query = lemmatize(query)
+    query = query.split()
+
+    #filter relevant documents
+    calc_tf_idf()
+    for query_word in query:
+        for doc in term_weight_db:
+            for key in term_weight_db[doc]:
+                if query_word == key:
+                    relDocs.update({doc:{}})
+                    relDocs[doc].update({query_word:term_weight_db[doc][key]})
+                else:
+                    pass        
+
+                
