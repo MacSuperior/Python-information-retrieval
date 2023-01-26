@@ -231,15 +231,29 @@ def search_tf_idf(query):
 
     #filter relevant documents
     calc_tf_idf()
-    for query_word in query:
-        for doc in term_weight_db:
+    for doc in term_weight_db:
+        relDocs.update({doc:{}})
+        for query_word in query:
             for key in term_weight_db[doc]:
                 if query_word == key:
-                    relDocs.update({doc:{}})
-                    relDocs[doc].update({query_word:term_weight_db[doc][key]})
+                    relDocs[doc].update({key:term_weight_db[doc][key]})
                 else:
                     pass        
 
     #calculate vector lenght for query
+    global query_vlength
     query_vlength = math.sqrt(len(query))
+
+    #calculate dot product for relevant documents and query
+    global dot_product_db
+    dot_product_db = {}
+    for doc in relDocs:
+        score = 0
+        if bool(relDocs[doc]) == True:     #docs with no query terms are skipped
+            for key in relDocs[doc]:
+                product = term_weight_db[doc][key] * 1      #query terms weigh 1
+                score += product
+            dot_product_db.update({doc:score})
+        else:
+            pass
 
