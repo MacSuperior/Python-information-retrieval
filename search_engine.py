@@ -257,3 +257,10 @@ def search_tf_idf(query):
         else:
             pass
 
+    #calculate cosine similarity between query and docs
+    global cosine_sim_db
+    cosine_sim_db = {}
+    for doc in dot_product_db:
+        cos_sim = dot_product_db[doc] / (query_vlength * vector_lenghts_db[doc])
+        cosine_sim_db.update({doc:cos_sim})
+
