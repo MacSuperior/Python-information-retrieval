@@ -225,7 +225,6 @@ def calc_tf_idf(doc_folder="database"):
 def search_tf_idf(query):
     global relDocs
     relDocs = {}
-    result = {}
     query = lemmatize(query)
     query = query.split()
 
@@ -263,4 +262,9 @@ def search_tf_idf(query):
     for doc in dot_product_db:
         cos_sim = dot_product_db[doc] / (query_vlength * vector_lenghts_db[doc])
         cosine_sim_db.update({doc:cos_sim})
+
+    #write cosine similarity dict to matrix
+    global result
+    unranked = ([[k, v] for k,v in cosine_sim_db.items()])     #source: stackoverflow.com
+
 
