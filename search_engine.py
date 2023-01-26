@@ -240,4 +240,6 @@ def search_tf_idf(query):
                 else:
                     pass        
 
-                
+    #calculate vector lenght for query
+    query_vlength = math.sqrt(len(query))
+
