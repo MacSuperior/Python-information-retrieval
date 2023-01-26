@@ -267,4 +267,8 @@ def search_tf_idf(query):
     global result
     unranked = ([[k, v] for k,v in cosine_sim_db.items()])     #source: stackoverflow.com
 
+    #rank results
+    result = sorted(unranked, key=lambda score : score[1], reverse=True)
+    print(result)
+    
 
