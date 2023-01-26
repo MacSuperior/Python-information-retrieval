@@ -9,14 +9,14 @@ tf_db = search_engine.calc_term_frequency()
 @app.route("/")
 def index():
     search_engine.update_database()
-    return render_template("index.html",  tf_db = tf_db)
+    return render_template("index.html")
 
 #after searching
 @app.route('/search', methods = ["GET", "POST"])
 def search():
     query = request.args.get("query")
-    q_res = search_engine.search_bool(query)
-    return render_template('index.html', query = query, q_res = q_res)
+    q_res, preview = search_engine.search_bool(query)
+    return render_template('index.html', query = query, q_res = q_res, preview = preview)
 
 if __name__ == "__main__":
     app.config['TEMPLATES_AUTO_RELOAD']=True
