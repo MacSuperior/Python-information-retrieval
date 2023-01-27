@@ -148,6 +148,7 @@ def update_database():
     calc_term_frequency()
     calc_indice_matrix() #depends on $tf_db
     calc_pageranks()
+    calc_tf_idf_matrix()
     print("database updated")
 
 # THIS HAS TO HAPPEN ONLY ONCE, BUT ALSO WHEN DOC_COLLECION IS UPDATED
@@ -165,117 +166,71 @@ def update_database():
 #4. show ranked outputs
 
 #calculate tf-idf model
-def calc_tf_idf(doc_folder="database"):
-    #calculate document frequency for all terms
-    df_db = {}
-    docfreq_db = {}
+def calc_tf_idf_matrix():
 
     #list all unique terms // total term frequency
+    termsFreqs = {}
+
     for file in listdir("database"):
         if file.startswith("lemmatized"):
             with open(f"database/{file}", "r") as f:
                 content = f.read()
                 for word in content.split():
-                    if word in df_db:
-                        df_db[word] += 1
+                    word = word.casefold()
+                    if word in termsFreqs:
+                        termsFreqs[word] += 1
                     else:
-                        df_db.update({word:1})
-    
-    calc_term_frequency()
+                        termsFreqs.update({word:1})
+
     #document frequency
-    for word in df_db:
+    docFreqs = {}
+    calc_term_frequency()
+    for word in termsFreqs:
         for doc, docContent in tf_db.items():
             if word in docContent:
-                if word in docfreq_db:
-                    docfreq_db[word] += 1
+                if word in docFreqs:
+                    docFreqs[word] += 1
                 else:
-                    docfreq_db.update({word:1})
+                    docFreqs.update({word:1})
+            else:
+                pass
 
     #inverse document frequency
     N = len(listdir("doc_collection"))
-    for word, freq in docfreq_db.items():
-        docfreq_db[word] = math.log2(N/freq)
+    for word, freq in docFreqs.items():
+        docFreqs[word] = math.log2(N/freq)
+
+    #term weights
+    tf_idf_db = {}
+    for term, freq in termsFreqs.items():
+        tf_idf_db.update({term:docFreqs[term] * freq})
     
-
-    ##previous code below, to remove later
-    #convert into inverse document frequency
-    global idf_db
-    N = 10    #number of documents
-    idf_db = {}
-    for term in df_db:
-        idf_value = math.log2(N/df_db[term])
-        idf_db.update({term:idf_value})
-
-    #create term frequency dictionary
-    calc_term_frequency()
-
-    #calculate term weight for all terms
-    global term_weight_db
-    term_weight_db = {}
-    for doc in tf_db:
-        term_weight_db.update({doc:{}})
-        for term in tf_db[doc]:
-            weight = idf_db[term] * tf_db[doc][term]
-            term_weight_db[doc].update({term:weight})
-
-    #create vector lenghts for all documents
-    global vector_lenghts_db
-    vector_lenghts_db = {}
-    for doc in term_weight_db:
-        x = 0
-        for term in term_weight_db[doc]:
-                x += term_weight_db[doc][term] ** 2
-        doc_lenght = math.sqrt(x)
-        vector_lenghts_db.update({doc:doc_lenght})
-
-#search relevant documents with tf-idf
+    global twMatrix
+    twMatrix = {}
+    for doc, content in tf_db.items():
+        twMatrix.update({doc:{}})
+        for term in content:
+            twMatrix[doc].update({term:tf_idf_db[term]})
+    return
+    
 def search_tf_idf(query):
-    global relDocs
-    relDocs = {}
-    query = lemmatize(query)
-    query = query.split()
+    query = lemmatize(query).split()  
 
-    #filter relevant documents
-    calc_tf_idf()
-    for doc in term_weight_db:
-        relDocs.update({doc:{}})
-        for query_word in query:
-            for key in term_weight_db[doc]:
-                if query_word == key:
-                    relDocs[doc].update({key:term_weight_db[doc][key]})
-                else:
-                    pass        
+    dotProd = 0
+    qLen = math.sqrt(len(query))
+    dLen = {}
+    cosSimMatrix = {}
+    for doc, content in twMatrix.items():
+        tws = 0
+        for term, tw in content.items():
+            tws += math.pow(tw, 2)
+            if term in query:
+                dotProd += tw
+        docLen = math.sqrt(tws)
+        dLen.update({doc:docLen})
 
-    #calculate vector lenght for query
-    global query_vlength
-    query_vlength = math.sqrt(len(query))
+        cosSim = dotProd / qLen * docLen
+        cosSimMatrix.update({doc:cosSim})
 
-    #calculate dot product for relevant documents and query
-    global dot_product_db
-    dot_product_db = {}
-    for doc in relDocs:
-        score = 0
-        if bool(relDocs[doc]) == True:     #docs with no query terms are skipped
-            for key in relDocs[doc]:
-                product = term_weight_db[doc][key] * 1      #query terms weigh 1
-                score += product
-            dot_product_db.update({doc:score})
-        else:
-            pass
-
-    #calculate cosine similarity between query and docs
-    global cosine_sim_db
-    cosine_sim_db = {}
-    for doc in dot_product_db:
-        cos_sim = dot_product_db[doc] / (query_vlength * vector_lenghts_db[doc])
-        cosine_sim_db.update({doc:cos_sim})
-
-    #write cosine similarity dict to matrix
-    global result
-    unranked = ([[k, v] for k,v in cosine_sim_db.items()])     #source: stackoverflow.com
-
-    #rank results
-    result = sorted(unranked, key=lambda score : score[1], reverse=True)
-    print(result)
-    
-
+        cosSimMatrix = {key: val for key, val in sorted(cosSimMatrix.items(), key = lambda ele: ele[1], reverse = True)}
+    return cosSimMatrix
