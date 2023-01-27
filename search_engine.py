@@ -3,6 +3,8 @@ import csv
 import spacy
 import math
 nlp = spacy.load('en_core_web_sm')
+stopwords = nlp.Defaults.stop_words
+
 
 #Lemmatizes a string
 def lemmatize(input):
@@ -20,6 +22,12 @@ def lemmatize_docs(doc_folder="doc_collection"):
                 lemFile.write(lemContent)
     return
 
+def remove_stopwords(query):
+    Nquery = []
+    for term in query.split():
+        if term not in stopwords:
+            Nquery.append(term)
+    return " ".join(Nquery)
 #Create a tf_indice for every document in the given folder.
 def calc_term_frequency(folder="database"):
     global tf_db
@@ -116,8 +124,8 @@ def search_bool(query,incidenceMatrix="database/term_incidence.csv", pagerankSco
     vectorList = []
     relDocs = []
     result = {}
-    query = lemmatize(query)
-    query = query.split()
+    query = remove_stopwords(query)
+    query = lemmatize(query).split()
 
     #Create document incidence vectors
     with open (incidenceMatrix, "r") as f:
@@ -193,25 +201,28 @@ def calc_tf_idf_matrix():
 
 #Performs a tf-idf query and ranks by cosine similarity
 def search_tf_idf(query):
+    query = remove_stopwords(query)
     query = lemmatize(query).split()  
 
     dotProd = 0
     qLen = math.sqrt(len(query))
-    dLen = {}
     cosSimMatrix = {}
     for doc, content in twMatrix.items():
-        tws = 0
-        for term, tw in content.items():
-            tws += math.pow(tw, 2)
-            if term in query:
-                dotProd += tw
-        docLen = math.sqrt(tws)
-        dLen.update({doc:docLen})
+        for x in query:
+            if x not in content:
+                pass
+            else:
+                tws = 0
+                for term, tw in content.items():
+                    tws += math.pow(tw, 2)
+                    if term in query:
+                        dotProd += tw
 
-        cosSim = dotProd / qLen * docLen
-        cosSimMatrix.update({doc:cosSim})
+                dLen = math.sqrt(tws)
+                cosSim = dotProd / qLen * dLen
+                cosSimMatrix.update({doc:cosSim})
 
-        cosSimMatrix = {key: val for key, val in sorted(cosSimMatrix.items(), key = lambda ele: ele[1], reverse = True)}
+                cosSimMatrix = {key: val for key, val in sorted(cosSimMatrix.items(), key = lambda ele: ele[1], reverse = True)}
     return cosSimMatrix
 
 #Initializes/Updates database, runs on startup
@@ -221,4 +232,118 @@ def update_database():
     calc_indice_matrix() #depends on $tf_db
     calc_pageranks()
     calc_tf_idf_matrix()
+    calc_tf_idf2()
     print("database updated")
+
+#calculates tf-idf model (other version of calc_tf_idf_matrix)
+def calc_tf_idf2(doc_folder="database"):
+    #calculate document frequency for all terms
+    global df_db
+    df_db = {}
+
+    #list all unique terms
+    for file in listdir(doc_folder):
+        if file.startswith("lemmatized_doc"):
+            with open(f"{doc_folder}/{file}", "r") as doc:
+                for line in doc:
+                    for word in line.split():
+                        word = word.lower()
+                        df_db.update({word:0})
+        else:
+            pass
+
+    #count document frequencies
+    for term in df_db:
+        for file in listdir(doc_folder):
+            if file.startswith("lemmatized_doc"):
+                with open(f"{doc_folder}/{file}", "r") as doc:
+                    if term in doc.read():
+                        df_db[term] += 1
+            else:
+                pass
+
+    #convert into inverse document frequency
+    global idf_db
+    N = 10    #number of documents
+    idf_db = {}
+    for term in df_db:
+        idf_value = math.log2(N/df_db[term])
+        idf_db.update({term:idf_value})
+
+    #create term frequency dictionary
+    calc_term_frequency()
+
+    #calculate term weight for all terms
+    global term_weight_db
+    term_weight_db = {}
+    for doc in tf_db:
+        term_weight_db.update({doc:{}})
+        for term in tf_db[doc]:
+            weight = idf_db[term] * tf_db[doc][term]
+            term_weight_db[doc].update({term:weight})
+
+    #create vector lenghts for all documents
+    global vector_lenghts_db
+    vector_lenghts_db = {}
+    for doc in term_weight_db:
+        x = 0
+        for term in term_weight_db[doc]:
+                x += term_weight_db[doc][term] ** 2
+        doc_lenght = math.sqrt(x)
+        vector_lenghts_db.update({doc:doc_lenght})
+
+#search relevant documents with tf-idf (other version of search_tf_idf)
+def search_tf_idf2(query):
+    global relDocs
+    relDocs = {}
+    query = remove_stopwords(query)
+    query = lemmatize(query)
+    query = query.split()
+
+    #filter relevant documents
+    calc_tf_idf_matrix()
+    for doc in term_weight_db:
+        relDocs.update({doc:{}})
+        for query_word in query:
+            for key in term_weight_db[doc]:
+                if query_word == key:
+                    relDocs[doc].update({key:term_weight_db[doc][key]})
+                else:
+                    pass        
+
+    #calculate vector lenght for query
+    global query_vlength
+    query_vlength = math.sqrt(len(query))
+
+    #calculate dot product for relevant documents and query
+    global dot_product_db
+    dot_product_db = {}
+    for doc in relDocs:
+        score = 0
+        if bool(relDocs[doc]) == True:     #docs with no query terms are skipped
+            for key in relDocs[doc]:
+                product = term_weight_db[doc][key] * 1      #query terms weigh 1
+                score += product
+            dot_product_db.update({doc:score})
+        else:
+            pass
+
+    #calculate cosine similarity between query and docs
+    global cosine_sim_db
+    cosine_sim_db = {}
+    for doc in dot_product_db:
+        cos_sim = dot_product_db[doc] / (query_vlength * vector_lenghts_db[doc])
+        cosine_sim_db.update({doc:cos_sim})
+
+    #write cosine similarity dict to matrix
+    global result
+    unranked = ([[k, v] for k,v in cosine_sim_db.items()])     #source: stackoverflow.com
+
+    #rank results
+    result = sorted(unranked, key=lambda score : score[1], reverse=True)
+    print(result)
+
+update_database()
+print(search_bool("what is aerodynamic"))
+search_tf_idf2("what is aerodynamic")
+print(search_tf_idf("what is aerodynamic"))
