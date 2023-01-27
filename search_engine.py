@@ -167,30 +167,37 @@ def update_database():
 #calculate tf-idf model
 def calc_tf_idf(doc_folder="database"):
     #calculate document frequency for all terms
-    global df_db
     df_db = {}
+    docfreq_db = {}
 
-    #list all unique terms
-    for file in listdir(doc_folder):
-        if file.startswith("lemmatized_doc"):
-            with open(f"{doc_folder}/{file}", "r") as doc:
-                for line in doc:
-                    for word in line.split():
-                        word = word.lower()
-                        df_db.update({word:0})
-        else:
-            pass
+    #list all unique terms // total term frequency
+    for file in listdir("database"):
+        if file.startswith("lemmatized"):
+            with open(f"database/{file}", "r") as f:
+                content = f.read()
+                for word in content.split():
+                    if word in df_db:
+                        df_db[word] += 1
+                    else:
+                        df_db.update({word:1})
+    
+    calc_term_frequency()
+    #document frequency
+    for word in df_db:
+        for doc, docContent in tf_db.items():
+            if word in docContent:
+                if word in docfreq_db:
+                    docfreq_db[word] += 1
+                else:
+                    docfreq_db.update({word:1})
 
-    #count document frequencies
-    for term in df_db:
-        for file in listdir(doc_folder):
-            if file.startswith("lemmatized_doc"):
-                with open(f"{doc_folder}/{file}", "r") as doc:
-                    if term in doc.read():
-                        df_db[term] += 1
-            else:
-                pass
+    #inverse document frequency
+    N = len(listdir("doc_collection"))
+    for word, freq in docfreq_db.items():
+        docfreq_db[word] = math.log2(N/freq)
+    
 
+    ##previous code below, to remove later
     #convert into inverse document frequency
     global idf_db
     N = 10    #number of documents
