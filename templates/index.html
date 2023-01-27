@@ -25,7 +25,7 @@
                 <th>Document</th>
                 <th>PageRank Value</th>
             </tr>
-            {% for doc, pr in q_res.items() %}
+            {% for doc, pr in q_res_bool.items() %}
             <tr>
                 <td>{{ doc }}</td>
                 <td>{{ pr }}</td>
@@ -35,7 +35,7 @@
     </div>
     <div class = "q_tf-idf">
         <h2>tf-idf query</h2>
-        <p>The relevant documents are: {{ q_res }}</p>
+        <p>The relevant documents are: {{ q_res_tf_idf }}</p>
     </div>
 
     {% endif %}
