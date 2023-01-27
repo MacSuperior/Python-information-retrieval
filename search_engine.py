@@ -4,6 +4,7 @@ import spacy
 import math
 nlp = spacy.load('en_core_web_sm')
 
+#Lemmatizes a string
 def lemmatize(input):
     query = nlp(input)
     Lemquery = " ".join([token.lemma_ for token in query])
@@ -110,8 +111,7 @@ def write_pagerank(pagerankScores, fileLocation = "database/pagerank_scores.txt"
         for k, v, in pagerankScores.items():
             f.write(f"{k} {v}\n")
 
-#TODO Optional: create (random) pagerank file
-#Performs a boolean AND query and returns all relevant documents
+#Performs a boolean AND query and ranks by pagerank
 def search_bool(query,incidenceMatrix="database/term_incidence.csv", pagerankScores = "database/pagerank_scores.txt"):
     vectorList = []
     relDocs = []
@@ -143,29 +143,7 @@ def search_bool(query,incidenceMatrix="database/term_incidence.csv", pagerankSco
         result = {key: val for key, val in sorted(result.items(), key = lambda ele: ele[1], reverse=True)}
     return result
 
-def update_database():
-    lemmatize_docs()
-    calc_term_frequency()
-    calc_indice_matrix() #depends on $tf_db
-    calc_pageranks()
-    calc_tf_idf_matrix()
-    print("database updated")
-
-# THIS HAS TO HAPPEN ONLY ONCE, BUT ALSO WHEN DOC_COLLECION IS UPDATED
-#1. lemmatize every doc in collection
-#2. create term frequency DB
-#3. create term incidence csv
-#4 create pagerank scores
-#5 create term frequency csv
-#6 create term weight matrix csv
-
-#THIS HAS TO HAPPEN FOR EVERY SEARCH QUERY
-#1. lemmatize query
-#2. search with boolean boolean model and order by pagerank
-#3. search with tf-idf model and order by cosine similarity
-#4. show ranked outputs
-
-#calculate tf-idf model
+#calculate tf-idf matrix
 def calc_tf_idf_matrix():
 
     #list all unique terms // total term frequency
@@ -212,7 +190,8 @@ def calc_tf_idf_matrix():
         for term in content:
             twMatrix[doc].update({term:tf_idf_db[term]})
     return
-    
+
+#Performs a tf-idf query and ranks by cosine similarity
 def search_tf_idf(query):
     query = lemmatize(query).split()  
 
@@ -234,3 +213,12 @@ def search_tf_idf(query):
 
         cosSimMatrix = {key: val for key, val in sorted(cosSimMatrix.items(), key = lambda ele: ele[1], reverse = True)}
     return cosSimMatrix
+
+#Initializes/Updates database, runs on startup
+def update_database():
+    lemmatize_docs()
+    calc_term_frequency()
+    calc_indice_matrix() #depends on $tf_db
+    calc_pageranks()
+    calc_tf_idf_matrix()
+    print("database updated")
