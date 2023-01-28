@@ -11,21 +11,21 @@ It will retrieve them using two models:
 
 ### Boolean + PageRank model
 
-* queries terms are treated as a boolean AND query
-* Results are ordered by PageRank values
+* queries terms are treated as a boolean AND query.
+* Results are ordered by PageRank values.
 
 ### Tf-idf model
 
-* Queries are treated as vectors
-* Results are ordered by cosine similarity values.
+* Queries and documents are treated as vectors.
+* Results are ordered by cosine similarity.
 
 ### Possible future extensions on the system
 
 > These features are not implemented in the current system
 
-* it has a 'next' button for showing  more results
-* the user can indicate a minimum recommendation threshold (e.g., 0.6 or a level in the scale, i.e., high, medium, or low). Only the documents with a similarity equal to or bigger than the threshold are displayed in the results
-* it can deal with structured documents, such as HTML pages
-* it shows metadata of documents in the ranked output
-* it implements some non-trivial form of personalization
-* visualization of the graph with the PageRank values
+* it has a 'next' button for showing  more results.
+* the user can indicate a minimum recommendation threshold (e.g., 0.6 or a level in the scale, i.e., high, medium, or low). Only the documents with a similarity equal to or bigger than the threshold are displayed in the results.
+* it can deal with structured documents, such as HTML pages.
+* it shows metadata of documents in the ranked output.
+* it implements some non-trivial form of personalization.
+* visualization of the graph with the PageRank values.
