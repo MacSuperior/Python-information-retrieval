@@ -48,7 +48,7 @@ def calc_term_frequency(folder="database"):
             pass
     return
 
-def calc_indice_matrix(fileLocation="database/term_incidence.csv"):
+def calc_incidence_matrix(fileLocation="database/term_incidence.csv"):
     headers = [""]
     terms = []
 
@@ -223,9 +223,7 @@ def search_tf_idf(query):
 def update_database():
     lemmatize_docs()
     calc_term_frequency()
-    calc_indice_matrix() #depends on $tf_db
+    calc_incidence_matrix() #depends on $tf_db
     calc_pageranks()
     calc_tf_idf_matrix()
-    calc_tf_idf2()
     print("database updated")
-    
