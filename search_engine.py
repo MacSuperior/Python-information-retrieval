@@ -2,6 +2,7 @@ from os import listdir
 import csv
 import spacy
 import math
+import random
 nlp = spacy.load('en_core_web_sm')
 stopwords = nlp.Defaults.stop_words
 
@@ -119,6 +120,30 @@ def write_pagerank(pagerankScores, fileLocation = "database/pagerank_scores.txt"
         for k, v, in pagerankScores.items():
             f.write(f"{k} {v}\n")
 
+#load big dataset into list
+def create_doc_collection():
+    global lg_doc_collection
+    lg_doc_collection = []
+    with open("database/cran_all_1400.txt") as f:
+        content = f.readlines()
+        for i, line in enumerate(content):
+            if line == ".W\n":
+                lg_doc_collection.append([])
+                for line in content[i+1:]:
+                    if line.startswith(".I") != True:
+                        lg_doc_collection[-1].append(line)
+                    else:
+                        break
+    return
+
+#create pagerank graph for specified document collection
+def create_pagerank_graph(fileName = "pagerank_graph.txt", docCollection="doc_collection"):
+    with open(f"database/{fileName}", "w") as f:
+        allFiles = listdir(docCollection)
+        for doc in allFiles:
+            line = f"{doc} {' '.join(random.choices(allFiles, k= random.randint(1, 6)))}"
+            f.write(f"{line}\n")
+
 #Performs a boolean AND query and ranks by pagerank
 def search_bool(query,incidenceMatrix="database/term_incidence.csv", pagerankScores = "database/pagerank_scores.txt"):
     vectorList = []
@@ -223,6 +248,8 @@ def search_tf_idf(query):
 def update_database():
     lemmatize_docs()
     calc_term_frequency()
+    create_doc_collection() #load big dataset
+    create_pagerank_graph()
     calc_incidence_matrix() #depends on $tf_db
     calc_pageranks()
     calc_tf_idf_matrix()
