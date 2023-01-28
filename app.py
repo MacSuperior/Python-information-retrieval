@@ -3,15 +3,13 @@ import search_engine
 
 app = Flask(__name__)
 
-tf_db = search_engine.calc_term_frequency()
-
 #index
 @app.route("/")
 def index():
     search_engine.update_database()
-    return render_template("index.html",  tf_db = tf_db)
+    return render_template("index.html")
 
-#after searching
+#results page
 @app.route('/search', methods = ["GET", "POST"])
 def search():
     query = request.args.get("query")
