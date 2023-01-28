@@ -3,20 +3,19 @@ import search_engine
 
 app = Flask(__name__)
 
-tf_db = search_engine.calc_term_frequency()
-
 #index
 @app.route("/")
 def index():
     search_engine.update_database()
     return render_template("index.html")
 
-#after searching
+#results page
 @app.route('/search', methods = ["GET", "POST"])
 def search():
     query = request.args.get("query")
-    q_res, preview = search_engine.search_bool(query)
-    return render_template('index.html', query = query, q_res = q_res, preview = preview)
+    q_res_bool = search_engine.search_bool(query)
+    q_res_tf_idf = search_engine.search_tf_idf(query)
+    return render_template('index.html', query = query, q_res_bool = q_res_bool, q_res_tf_idf = q_res_tf_idf)
 
 if __name__ == "__main__":
     app.config['TEMPLATES_AUTO_RELOAD']=True

@@ -25,20 +25,28 @@
                 <th>Document</th>
                 <th>PageRank Value</th>
             </tr>
-            {% for doc, pr in q_res.items() %}
-            <tr>
-                <td>{{ doc }}</td>
-                <td>{{ pr }}</td>
-            </tr>
-            <tr>
-                <td style="background-color:grey;">{{ preview[doc] }}</td>
-            </tr>
+            {% for doc, pr in q_res_bool.items() %}
+                <tr>
+                    <td>{{ doc }}</td>
+                    <td>{{ pr }}</td>
+                </tr>
             {% endfor %}
         </table>
     </div>
     <div class = "q_tf-idf">
         <h2>tf-idf query</h2>
-        <p>The relevant documents are: {{ q_res }}</p>
+        <table class = "tf-idf-results">
+            <tr>
+                <th>document</th>
+                <th>cosine similarity</th>                
+            </tr>
+            {% for doc, cosSim in q_res_tf_idf.items() %}
+                <tr>
+                    <td>{{ doc }}</td>
+                    <td>{{ cosSim }}</td>
+                </tr>
+            {% endfor %}
+        </table>
     </div>
 
     {% endif %}
