@@ -26,6 +26,6 @@ It will retrieve them using two models:
 * it has a 'next' button for showing  more results
 * the user can indicate a minimum recommendation threshold (e.g., 0.6 or a level in the scale, i.e., high, medium, or low). Only the documents with a similarity equal to or bigger than the threshold are displayed in the results
 * it can deal with structured documents, such as HTML pages
-* it shows metadata or relevant content of documents in the ranked output
+* it shows metadata of documents in the ranked output
 * it implements some non-trivial form of personalization
 * visualization of the graph with the PageRank values
