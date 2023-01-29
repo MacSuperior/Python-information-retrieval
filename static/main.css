@@ -9,3 +9,7 @@ table {
 .q_tf-idf {
     float: right;
 }
+
+form {
+    top:50%;
+}
