@@ -17,7 +17,7 @@ def lemmatize(input):
 # Lemmatize documents for use in all other functions
 def lemmatize_docs(doc_folder="docs"):
     for file in listdir(doc_folder):
-        with open(f"doc_collection/{file}", "r") as f:
+        with open(f"docs/{file}", "r") as f:
             content = " ".join(f.read().splitlines())
             lemContent = lemmatize(content)
             with open(f"database/lemmatized_{file}", "w") as lemFile:
