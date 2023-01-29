@@ -9,3 +9,11 @@ table {
 .q_tf-idf {
     float: right;
 }
+
+body {
+    background-color: rgb(31, 30, 37);
+}
+
+.track {
+    border: 1px solid red;
+}
