@@ -12,7 +12,7 @@
 		{% if not query %}
 		<div class="container-fluid d-flex flex-column min-vh-100">
 			<div class="row m-3 d-flex flex-grow-1 align-items-end">
-				<span class="display-1 text-center text-white">Search engine</span>
+				<span class="display-1 text-center text-white">Searchussy engine</span>
 			</div>
 			<div class="container d-flex flex-grow-1 justify-content-center align-items-start">
 				<form class ="col-8" action="search">
@@ -28,40 +28,43 @@
 		<!-- Start of search results -->
 
 		{% if query %}
-		<p>Showing results for <b>{{ query }}</b>:</p>
-		<div class = "q_bool">
-				<h2>Results: Boolean + pagerank model</h2>        
-				<p>The relevant documents are:</p>
-				<table class = "bool-results">
-						<tr>
-								<th>Document</th>
-								<th>PageRank Value</th>
-						</tr>
-						{% for doc, pr in q_res_bool.items() %}
-								<tr>
-										<td>{{ doc }}</td>
-										<td>{{ pr }}</td>
-										<td>{{ boolPreview[doc] }}
-								</tr>
-						{% endfor %}
-				</table>
+		<div class="container-fluid">
+			<div class="row">
+			<nav class="navbar navbar-expand-sm">
+				<div class="container-fluid">
+					<a class="navbar-brand text-white" href="/">Searchussy</a>
+					<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+						<span class="navbar-toggler-icon"></span>
+					</button>
+				<div class="collapse navbar-collapse m-2" id="navbarSupportedContent">
+					<form class="d-flex col-6" role="search" action="search">
+						<input class="form-control bg-dark border-light-subtle text-bg-dark border-0" type="search" placeholder="Search" aria-label="Search" name = "query" id = "query">
+					</form>
+				</div>
+			</nav>
 		</div>
-		<div class = "q_tf-idf">
-				<h2>tf-idf query</h2>
-				<table class = "tf-idf-results">
-						<tr>
-								<th>document</th>
-								<th>cosine similarity</th>                
-						</tr>
-						{% for doc, cosSim in q_res_tf_idf.items() %}
-								<tr>
-										<td>{{ doc }}</td>
-										<td>{{ cosSim }}</td>
-										<td>{{ tfIdfPreview[doc] }}</td>
-								</tr>
-						{% endfor %}
-				</table>
+			<div class="row">
+				<div class="col-sm-6 text-white">
+				<h1 class="display-1">Boolean Model</h1>
+				{% for doc, pr in q_res_bool.items() %}
+				<div class="m-3">
+					<h2 class="mt-5">{{ doc }} <span class="h6 text-dark-emphasis">({{ pr }})</span></h1>
+					<p class="col-7">{{ boolPreview[doc] }}</p>
+				</div>
+				{% endfor %}
 			</div>
+			<div class="col-sm-6 text-white">
+				<h1 class="display-1">Tf-Idf Model</h1>
+				{% for doc, cosSim in q_res_tf_idf.items() %}
+				<div class="m-3">
+					<h2 class="mt-5">{{ doc }}
+						<span class="h6 text-dark-emphasis">({{ cosSim }})</span></h1>
+					<p class="col-7">{{ tfIdfPreview[doc] }}</p>
+				</div>
+				{% endfor %}
+			</div>
+			</div>
+		</div>
 		{% endif %}
 	</body>
 </html>
