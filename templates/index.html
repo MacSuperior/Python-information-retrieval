@@ -9,6 +9,7 @@
 			<link rel = "stylesheet" type="text/css" href="{{url_for('.static', filename='main.css')}}">
 	</head>
 	<body>
+		{% if not query %}
 		<div class="container-fluid d-flex flex-column min-vh-100">
 			<div class="row m-3 d-flex flex-grow-1 align-items-end">
 				<span class="display-1 text-center text-white">Search engine</span>
@@ -17,11 +18,12 @@
 				<form class ="col-8" action="search">
 						<div class="input-group">
 							<input type="text" class="form-control" name = "query" id = "query">
-							<btn class="btn btn-dark" type="submit">search</btn>
+							<button class="btn btn-dark" type="submit" formaction="search">search</button>
 					</div>
 				</form>
 			</div>      
 		</div>
+		{% endif %}
 
 		<!-- Start of search results -->
 
@@ -39,6 +41,7 @@
 								<tr>
 										<td>{{ doc }}</td>
 										<td>{{ pr }}</td>
+										<td>{{ boolPreview[doc] }}
 								</tr>
 						{% endfor %}
 				</table>
@@ -54,6 +57,7 @@
 								<tr>
 										<td>{{ doc }}</td>
 										<td>{{ cosSim }}</td>
+										<td>{{ tfIdfPreview[doc] }}</td>
 								</tr>
 						{% endfor %}
 				</table>
