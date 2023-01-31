@@ -7,6 +7,7 @@
 			<title>Search here</title>
 			<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
 			<link rel = "stylesheet" type="text/css" href="{{url_for('.static', filename='main.css')}}">
+      <script src="https://kit.fontawesome.com/74c9725829.js" crossorigin="anonymous"></script>
 	</head>
 	<body>
 		{% if not query %}
@@ -16,9 +17,9 @@
 			</div>
 			<div class="container d-flex flex-grow-1 justify-content-center align-items-start">
 				<form class ="col-8" action="search">
-						<div class="input-group">
-							<input type="text" class="form-control" name = "query" id = "query">
-							<button class="btn btn-dark" type="submit" formaction="search">search</button>
+					<div class="input-group">
+						<input type="text" class="form-control bg-dark text-bg-dark border-0" name = "query" id = "query" autocomplete="off">
+						<button class="btn btn-dark-subtle text-bg-dark" type="submit" formaction="search"><i class="fa-solid fa-magnifying-glass"></i></button>
 					</div>
 				</form>
 			</div>      
@@ -38,29 +39,35 @@
 					</button>
 				<div class="collapse navbar-collapse m-2" id="navbarSupportedContent">
 					<form class="d-flex col-6" role="search" action="search">
-						<input class="form-control bg-dark border-light-subtle text-bg-dark border-0" type="search" placeholder="Search" aria-label="Search" name = "query" id = "query">
+            <div class="input-group">
+            	<input class="form-control bg-dark border-light-subtle text-bg-dark border-0" type="search" placeholder="Search" aria-label="Search" name = "query" id = "query" autocomplete="off">
+              <button class="btn btn-dark-subtle text-bg-dark" type="submit" formaction="search"><i class="fa-solid fa-magnifying-glass"></i></button>
+            </div>
 					</form>
 				</div>
 			</nav>
 		</div>
 			<div class="row">
 				<div class="col-sm-6 text-white">
-				<h1 class="display-1">Boolean Model</h1>
-				{% for doc, pr in q_res_bool.items() %}
-				<div class="m-3">
-					<h2 class="mt-5">{{ doc }} <span class="h6 text-dark-emphasis">({{ pr }})</span></h1>
-					<p class="col-7">{{ boolPreview[doc] }}</p>
-				</div>
-				{% endfor %}
+					<h1 class="display-1">Boolean Model</h1>
+          {% for doc, pr in q_res_bool.items() %}
+            <a href="/docs/{{ doc }}">
+              <div class="m-3">
+                <h2 class="mt-5">{{ doc }} <span class="h6 text-dark-emphasis">({{ pr[:5] }})</span></h2>
+                <p class="col-7">{{ boolPreview[doc] }}</p>
+            </div>
+            </a>
+				  {% endfor %}
 			</div>
 			<div class="col-sm-6 text-white">
 				<h1 class="display-1">Tf-Idf Model</h1>
 				{% for doc, cosSim in q_res_tf_idf.items() %}
-				<div class="m-3">
-					<h2 class="mt-5">{{ doc }}
-						<span class="h6 text-dark-emphasis">({{ cosSim }})</span></h1>
-					<p class="col-7">{{ tfIdfPreview[doc] }}</p>
-				</div>
+        <a href="/docs/{{ doc }}">
+				  <div class="m-3">
+					  <h2 class="mt-5">{{ doc }} <span class="h6 text-dark-emphasis">({{ cosSim[:5] }})</span></h1>
+					  <p class="col-7">{{ tfIdfPreview[doc] }}</p>
+				  </div>
+        </a>
 				{% endfor %}
 			</div>
 			</div>

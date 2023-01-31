@@ -21,3 +21,11 @@ body {
 p, table, h2 {
     color:white;
 }
+
+.fa-solid {
+    color:white;
+}
+
+a {
+    text-decoration: none
+}
