@@ -1,0 +1,23 @@
+table {
+    border: 1px solid;
+}
+
+.q_bool {
+    float: left;
+}
+
+.q_tf-idf {
+    float: right;
+}
+
+body {
+    background-color: rgb(30, 30, 32);
+}
+
+.track {
+    border: 1px solid red;
+}
+
+p, table, h2 {
+    color:white;
+}

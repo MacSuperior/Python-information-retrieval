@@ -1,5 +1,4 @@
 __pycache__/
 .DS_Store
-database/term_incidence.csv
-database/pagerank*
-huge_doc_collection/*
+database/*
+!database/cran_all_1400.txt

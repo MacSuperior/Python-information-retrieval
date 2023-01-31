@@ -1,47 +1,70 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Search here</title>
-    <link rel = "stylesheet" type="text/css" href="{{url_for('.static', filename='style.css')}}">
-</head>
-<body>
-    <h1>Search engine</h1>
-    <p>Search in english, boolean AND query: </p>
-    <p>try some searches! "effect of roughness on transition", "isothermal plate", "propeller"</p>
-    <form action = "search">
-        <input type = "text" name = "query" id = "query">
-        <input type = "submit">
-    </form>
-    {% if query %}
-    <p>Showing results for <b>{{ query }}</b>:</p>
-    <div class = "q_bool">
-        <h2>Results: Boolean + pagerank model</h2>        
-        <p>The relevant documents are:</p>
-        <table class = "bool-results">
-            <tr>
-                <th>Document</th>
-                <th>PageRank Value</th>
-            </tr>
-            {% for doc, pr in q_res.items() %}
-            <tr>
-                <td>{{ doc }}</td>
-                <td>{{ pr }}</td>
-            </tr>
-            <tr>
-                <td style="background-color:grey;">{{ preview[doc] }}</td>
-            </tr>
-            {% endfor %}
-        </table>
-    </div>
-    <div class = "q_tf-idf">
-        <h2>tf-idf query</h2>
-        <p>The relevant documents are: {{ q_res }}</p>
-    </div>
+	<head>
+			<meta charset="UTF-8">
+			<meta http-equiv="X-UA-Compatible" content="IE=edge">
+			<meta name="viewport" content="width=device-width, initial-scale=1.0">
+			<title>Search here</title>
+			<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+			<link rel = "stylesheet" type="text/css" href="{{url_for('.static', filename='main.css')}}">
+	</head>
+	<body>
+		{% if not query %}
+		<div class="container-fluid d-flex flex-column min-vh-100">
+			<div class="row m-3 d-flex flex-grow-1 align-items-end">
+				<span class="display-1 text-center text-white">Searchussy engine</span>
+			</div>
+			<div class="container d-flex flex-grow-1 justify-content-center align-items-start">
+				<form class ="col-8" action="search">
+						<div class="input-group">
+							<input type="text" class="form-control" name = "query" id = "query">
+							<button class="btn btn-dark" type="submit" formaction="search">search</button>
+					</div>
+				</form>
+			</div>      
+		</div>
+		{% endif %}
 
-    {% endif %}
+		<!-- Start of search results -->
 
-</body>
+		{% if query %}
+		<div class="container-fluid">
+			<div class="row">
+			<nav class="navbar navbar-expand-sm">
+				<div class="container-fluid">
+					<a class="navbar-brand text-white" href="/">Searchussy</a>
+					<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+						<span class="navbar-toggler-icon"></span>
+					</button>
+				<div class="collapse navbar-collapse m-2" id="navbarSupportedContent">
+					<form class="d-flex col-6" role="search" action="search">
+						<input class="form-control bg-dark border-light-subtle text-bg-dark border-0" type="search" placeholder="Search" aria-label="Search" name = "query" id = "query">
+					</form>
+				</div>
+			</nav>
+		</div>
+			<div class="row">
+				<div class="col-sm-6 text-white">
+				<h1 class="display-1">Boolean Model</h1>
+				{% for doc, pr in q_res_bool.items() %}
+				<div class="m-3">
+					<h2 class="mt-5">{{ doc }} <span class="h6 text-dark-emphasis">({{ pr }})</span></h1>
+					<p class="col-7">{{ boolPreview[doc] }}</p>
+				</div>
+				{% endfor %}
+			</div>
+			<div class="col-sm-6 text-white">
+				<h1 class="display-1">Tf-Idf Model</h1>
+				{% for doc, cosSim in q_res_tf_idf.items() %}
+				<div class="m-3">
+					<h2 class="mt-5">{{ doc }}
+						<span class="h6 text-dark-emphasis">({{ cosSim }})</span></h1>
+					<p class="col-7">{{ tfIdfPreview[doc] }}</p>
+				</div>
+				{% endfor %}
+			</div>
+			</div>
+		</div>
+		{% endif %}
+	</body>
 </html>
