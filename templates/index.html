@@ -10,7 +10,7 @@
       <script src="https://kit.fontawesome.com/74c9725829.js" crossorigin="anonymous"></script>
 	</head>
 	<body>
-		{% if not query %}
+		{% if not query or query|length == 0  %}
 		<div class="container-fluid d-flex flex-column min-vh-100">
 			<div class="row m-3 d-flex flex-grow-1 align-items-end">
 				<span class="display-1 text-center text-white">Searchussy engine</span>
@@ -28,7 +28,7 @@
 
 		<!-- Start of search results -->
 
-		{% if query %}
+		{% if query and query|length > 0 %}
 		<div class="container-fluid">
 			<div class="row">
 			<nav class="navbar navbar-expand-sm">
@@ -47,6 +47,25 @@
 				</div>
 			</nav>
 		</div>
+    {% if q_res_bool|length == 0 and q_res_tf_idf|length == 0 %}
+    <div class="row">
+      <div class="container">
+        <p>Your search for <strong>{{ query }}</strong> did not return any relevant documents.</p>
+        <p>suggestions:</p>
+        <ul>
+          <li>
+            <p>Make sure all words are spelled correctly.</p>
+          </li>
+          <li>
+            <p>Try other search terms.</p>
+          </li>
+          <li>
+            <p>Use fewer keywords</p>
+          </li>
+        </ul>
+      </div>
+    </div>
+    {% else %}
 			<div class="row">
 				<div class="col-sm-6 text-white">
 					<h1 class="display-1">Boolean Model</h1>
@@ -71,6 +90,7 @@
 				{% endfor %}
 			</div>
 			</div>
+      {% endif %}
 		</div>
 		{% endif %}
 	</body>

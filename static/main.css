@@ -6,11 +6,7 @@ body {
     border: 1px solid red;
 }
 
-p, h1, h2 {
-    color:white;
-}
-
-.fa-solid {
+p, h1, h2, a, li, .fa-solid {
     color:white;
 }
 
