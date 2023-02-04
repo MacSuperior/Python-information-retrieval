@@ -15,13 +15,23 @@ def index():
 @app.route('/search', methods=["GET", "POST"])
 def search():
     query = request.args.get("query")
+    global q_res_tf_idf
     q_res_bool, boolPreview = search_engine.search_bool(query)
     q_res_tf_idf, tfIdfPreview = search_engine.search_tf_idf(query)
 
-    return render_template('index.html', query=query, q_res_bool=q_res_bool,
+    return render_template("index.html", query=query, q_res_bool=q_res_bool,
                            q_res_tf_idf=q_res_tf_idf,
                            tfIdfPreview=tfIdfPreview,
                            boolPreview=boolPreview)
+
+
+# Document page
+@app.route('/docs/<doc>', methods=['GET', 'POST'])
+def view_document(doc):
+    print("route received")
+    with open(f"docs/{doc}") as f:
+        document = f.read()
+    return render_template("result.html", document = document, title = doc)
 
 
 if __name__ == "__main__":

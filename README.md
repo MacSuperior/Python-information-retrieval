@@ -6,7 +6,7 @@ Welcome! This Flask app is a small scale information retrieval system using Pyth
 
 ## Functionality
 
-The system searches a collection of N plain text documents in the doc_collection folder.
+The system searches a collection of plain text documents in the `docs` folder.
 It will retrieve them using two models:
 
 ### Boolean + PageRank model

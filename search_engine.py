@@ -195,7 +195,7 @@ def search_bool(query,incidenceMatrix="database/term_incidence.csv", pagerankSco
         for row in f:
             row = row.split()
             if f"lemmatized_{row[0]}" in relDocs:
-                result.update({row[0]:row[1]})
+                result.update({row[0]:str(row[1])})
         result = {key: val for key, val in sorted(result.items(), key = lambda ele: ele[1], reverse=True)}
     boolPreview = preview_document(query, result)
     return result, boolPreview
@@ -263,7 +263,7 @@ def search_tf_idf(query):
 
                 dLen = math.sqrt(tws)
                 cosSim = dotProd / (qLen * dLen)
-                cosSimMatrix.update({doc[11:]: cosSim})
+                cosSimMatrix.update({doc[11:]: str(cosSim)})
 
         cosSimMatrix = {key: val for key, val in sorted(cosSimMatrix.items(), key = lambda ele: ele[1], reverse = True)}
     tfIdfPreview = preview_document(query, cosSimMatrix)
