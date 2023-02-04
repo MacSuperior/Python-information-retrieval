@@ -271,11 +271,14 @@ def search_tf_idf(query):
 
 #Initializes/Updates database, runs on startup
 def update_database():
-    lemmatize_docs()
-    calc_term_frequency()
-    create_doc_collection() #load big dataset
-    create_pagerank_graph()
-    calc_incidence_matrix() #depends on $tf_db
-    calc_pageranks()
-    calc_tf_idf_matrix()
+    database = listdir("database")
+    if "lemmatized_doc1.txt" not in database:
+        lemmatize_docs()
+    if "pagerank_graph.txt" not in database:
+        calc_pageranks()
+        create_pagerank_graph()
+    else:
+        calc_term_frequency()
+        calc_incidence_matrix() #depends on $tf_db
+        calc_tf_idf_matrix()
     print("database updated")
