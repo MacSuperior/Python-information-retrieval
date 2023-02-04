@@ -7,11 +7,12 @@ nlp = spacy.load('en_core_web_sm')
 stopwords = nlp.Defaults.stop_words
 
 
-#Lemmatizes a string
+# Lemmatizes a string
 def lemmatize(input):
     query = nlp(input)
     Lemquery = " ".join([token.lemma_ for token in query])
     return Lemquery
+
 
 #Lemmatize documents for use in all other functions
 def lemmatize_docs(doc_folder="docs"):
@@ -23,12 +24,15 @@ def lemmatize_docs(doc_folder="docs"):
                 lemFile.write(lemContent)
     return
 
+
 def remove_stopwords(query):
     Nquery = []
     for term in query.split():
         if term not in stopwords:
             Nquery.append(term)
     return " ".join(Nquery)
+
+
 #Create a tf_indice for every document in the given folder.
 def calc_term_frequency(folder="database"):
     global tf_db
@@ -48,6 +52,7 @@ def calc_term_frequency(folder="database"):
         else:
             pass
     return
+
 
 def calc_incidence_matrix(fileLocation="database/term_incidence.csv"):
     headers = [""]
@@ -73,11 +78,12 @@ def calc_incidence_matrix(fileLocation="database/term_incidence.csv"):
                 terms[i].append(0)
 
     #Write file indice matrix to $file_location
-    with open(fileLocation, "w") as csvfile:
+    with open(fileLocation, "w", newline="") as csvfile:
         writer = csv.writer(csvfile)
         writer.writerow(headers)
         writer.writerows(terms) 
     return terms
+
 
 #Calculate pagerank for every file in $pagerankGraph
 def calc_pageranks(pagerankGraph = "database/pagerank_graph.txt", damping = 0.9, iterations = 100):
@@ -114,11 +120,13 @@ def calc_pageranks(pagerankGraph = "database/pagerank_graph.txt", damping = 0.9,
     write_pagerank(pagerankScores)
     return pagerankScores
 
+
 #Write file pageranks to file
 def write_pagerank(pagerankScores, fileLocation = "database/pagerank_scores.txt"):
     with open(fileLocation, "w") as f:
         for k, v, in pagerankScores.items():
             f.write(f"{k} {v}\n")
+
 
 #load big dataset into list
 def create_doc_collection():
@@ -135,6 +143,7 @@ def create_doc_collection():
                     else:
                         break
     return
+
 
 #create pagerank graph for specified document collection
 def create_pagerank_graph(fileName = "pagerank_graph.txt", docCollection="docs"):
@@ -200,10 +209,12 @@ def search_bool(query,incidenceMatrix="database/term_incidence.csv", pagerankSco
     boolPreview = preview_document(query, result)
     return result, boolPreview
 
+
 #calculate tf-idf matrix
 def calc_tf_idf_matrix():
 
     #list all unique terms 
+    calc_term_frequency()
     termsFreqs = set()
     for content in tf_db.values():
         for term in content:
@@ -237,6 +248,7 @@ def calc_tf_idf_matrix():
     tw_matrix = tf_db
     return tw_matrix
 
+
 #Performs a tf-idf query and ranks by cosine similarity
 def search_tf_idf(query):
     query = remove_stopwords(query)
@@ -247,6 +259,7 @@ def search_tf_idf(query):
     qLen = math.sqrt(len(query))
 
     #document vectors
+    calc_tf_idf_matrix()
     for doc, content in tw_matrix.items():
         #check if doc contains query terms:
         for x in query:
@@ -268,6 +281,7 @@ def search_tf_idf(query):
         cosSimMatrix = {key: val for key, val in sorted(cosSimMatrix.items(), key = lambda ele: ele[1], reverse = True)}
     tfIdfPreview = preview_document(query, cosSimMatrix)
     return cosSimMatrix, tfIdfPreview
+
 
 #Initializes/Updates database, runs on startup
 def update_database():
