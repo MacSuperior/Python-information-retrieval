@@ -51,6 +51,7 @@ def calc_term_frequency(folder="database"):
 
 def calc_incidence_matrix(fileLocation="database/term_incidence.csv"):
     headers = [""]
+    allWords = set()
     terms = []
 
     #Create headers list of all document names
@@ -61,7 +62,9 @@ def calc_incidence_matrix(fileLocation="database/term_incidence.csv"):
     for k, v in tf_db.items():
             v = v.keys()
             for term in v:
-                terms.append([term])
+                allWords.add(term)
+    for term in allWords:
+        terms.append([term])
 
     #Create word + an indice for each document 
     for i, word in enumerate(terms):
@@ -149,21 +152,20 @@ def create_pagerank_graph(fileName = "pagerank_graph.txt", docCollection="docs")
 def preview_document(query, result):
     preview = dict()
     for doc in result.keys():
-        with open(f"docs/{doc}") as f:
+        with open(f"docs/{doc}", "r") as f:
             content = f.readlines()
             for i, line in enumerate(content):
-                content[i] = line.rstrip().strip()
-            for line in content:
-                for term in query:
-                    if term in line:
+                if query[0] in line:
+                    try:
+                        preview.update({doc: f"{content[i-3:i+2]}..."})
+                        print(content[i])
+                    except IndexError:
                         try:
-                            preview.update({doc:f"{' '.join(content[i-3:i+1])}..."})             
+                            preview.update({doc: f"{content[i-1:i+1]}..."})
+                            print(content[i])
                         except IndexError:
-                            try:
-                                preview.update({doc:f"{content[i:i+3]}..."})
-                            except IndexError:
-                                preview.update({doc:f"{content[i-3:i]}..."})
-                        break
+                            preview.update({doc: f"{content[i+1]}..."})
+                            print(content[i])
     return preview
 
 
@@ -271,14 +273,31 @@ def search_tf_idf(query):
 
 #Initializes/Updates database, runs on startup
 def update_database():
-    database = listdir("database")
-    if "lemmatized_doc1.txt" not in database:
+    if "lemmatized_doc1.txt" not in listdir("database"):
         lemmatize_docs()
-    if "pagerank_graph.txt" not in database:
-        calc_pageranks()
-        create_pagerank_graph()
-    else:
-        calc_term_frequency()
-        calc_incidence_matrix() #depends on $tf_db
-        calc_tf_idf_matrix()
+    calc_pageranks()
+    create_pagerank_graph()
+    calc_term_frequency()
+    calc_incidence_matrix() #depends on $tf_db
+    calc_tf_idf_matrix()
     print("database updated")
+def t():
+    totalWords = 0
+    wordList = []
+    for doc in listdir("docs"):
+        with open(f"docs/{doc}") as f:
+            docWords = 0
+            for line in f:
+                for word in line:
+                    docWords += 1
+                    totalWords += 1
+            wordList.append(docWords)
+            print(f"words in {doc}: {docWords}")
+    print(f"words in total: {totalWords}")
+def wr():
+    docNumber = 1
+    for docContent in lg_doc_collection[0:201]:
+        docNumber += 1
+        with open(f"docs/doc{docNumber}.txt", "w") as f:
+            f.writelines(docContent)
+t()
