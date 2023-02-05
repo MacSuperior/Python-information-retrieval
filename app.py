@@ -55,7 +55,7 @@ def view_document(doc):
     print("route received")
     with open(f"docs/{doc}") as f:
         document = f.read()
-    return render_template("result.html", document = document, title = doc)
+    return render_template("result.html", document=document, title=doc)
 
 
 if __name__ == "__main__":
