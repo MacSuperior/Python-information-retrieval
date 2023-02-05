@@ -23,12 +23,15 @@ def lemmatize_docs(doc_folder="docs"):
                 lemFile.write(lemContent)
     return
 
+
+# Removes stopwords and interpunction from query
 def remove_stopwords(query):
-    Nquery = []
-    for term in query.split():
-        if term not in stopwords:
-            Nquery.append(term)
+    q = ''.join([i for i in query if (i.isalpha() is True) or (i.isspace() is True)])  # Remove interpunction
+    Nquery = [term for term in q.split() if term not in stopwords]  # Remove stopwords
+
     return " ".join(Nquery)
+
+
 #Create a tf_indice for every document in the given folder.
 def calc_term_frequency(folder="database"):
     global tf_db
@@ -301,4 +304,3 @@ def wr():
         docNumber += 1
         with open(f"docs/doc{docNumber}.txt", "w") as f:
             f.writelines(docContent)
-t()
