@@ -14,15 +14,39 @@ def index():
 # Results page
 @app.route('/search', methods=["GET", "POST"])
 def search():
-    query = request.args.get("query")
+    global query
+    global q_res_bool
     global q_res_tf_idf
+    global boolPreview
+    global tfIdfPreview
+
+    query = request.args.get("query")
+    resEnd = 5
+    resStart = 0
     q_res_bool, boolPreview = search_engine.search_bool(query)
     q_res_tf_idf, tfIdfPreview = search_engine.search_tf_idf(query)
 
     return render_template("index.html", query=query, q_res_bool=q_res_bool,
                            q_res_tf_idf=q_res_tf_idf,
                            tfIdfPreview=tfIdfPreview,
-                           boolPreview=boolPreview)
+                           boolPreview=boolPreview,
+                           resStart=resStart,
+                           resEnd=resEnd)
+
+
+@app.route('/updateresults', methods=["GET", "POST"])
+def updateresults():
+    resultPage = int(request.args.get("pageNum")) + 1
+    resEnd = resultPage * 5
+    resStart = resEnd - 4
+    print("results updated!")
+
+    return render_template("index.html", query=query, q_res_bool=q_res_bool,
+                           q_res_tf_idf=q_res_tf_idf,
+                           tfIdfPreview=tfIdfPreview,
+                           boolPreview=boolPreview,
+                           resStart=resStart,
+                           resEnd=resEnd)
 
 
 # Document page
