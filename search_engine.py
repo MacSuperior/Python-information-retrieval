@@ -15,9 +15,9 @@ def lemmatize(input):
 
 
 # Lemmatize documents for use in all other functions
-def lemmatize_docs(doc_folder="docs"):
-    for file in listdir(doc_folder):
-        with open(f"{doc_folder}/{file}", "r") as f:
+def lemmatize_docs(docFolder="docs"):
+    for file in listdir(docFolder):
+        with open(f"{docFolder}/{file}", "r") as f:
             content = " ".join(f.read().splitlines())
             lemContent = lemmatize(content)
             with open(f"database/lemmatized_{file}", "w") as lemFile:
@@ -37,7 +37,7 @@ def remove_stopwords(query):
     return Nquery
 
 
-# Create a tf_indice for every document in the given folder.
+# Create a tf_indice for every document in the given folder
 def calc_term_frequency(folder="database"):
     global tf_db
     tf_db = dict()
@@ -70,12 +70,12 @@ def calc_incidence_matrix(fileLocation="database/term_incidence.csv"):
 
     # Create terms list
     for k, v in tf_db.items():
-            v = v.keys()
-            for term in v:
-                allWords.add(term)
+        v = v.keys()
+        for term in v:
+            allWords.add(term)
 
     # Clean the data
-    words = ' '.join(allWords)        
+    words = ' '.join(allWords)
     allWords = remove_stopwords(clean_data(words)).split()
 
     for term in allWords:
@@ -158,7 +158,7 @@ def create_doc_collection():
     return
 
 
-# create pagerank graph for specified document collection
+# Create pagerank graph for specified document collection
 def create_pagerank_graph(fileName="pagerank_graph.txt", docCollection="docs"):
     with open(f"database/{fileName}", "w") as f:
         allFiles = listdir(docCollection)
@@ -187,7 +187,7 @@ def preview_document(query, result):
                                     break
                         except IndexError:
                             preview.update({doc: f"{' '.join(content)}..."})
-                            
+     
     return preview
 
 
@@ -225,17 +225,17 @@ def search_bool(query, incdnceMatrix="database/term_incidence.csv", prScores="da
     return result, boolPreview
 
 
-# calculate tf-idf matrix
+# Calculate tf-idf matrix
 def calc_tf_idf_matrix():
 
-    # list all unique terms
+    # List all unique terms
     calc_term_frequency()
     termsFreqs = set()
     for content in tf_db.values():
         for term in content:
             termsFreqs.add(term)
 
-    # document frequency
+    # Document frequency
     docFreqs = dict()
     for term in termsFreqs:
         for doc, content in tf_db.items():
@@ -247,14 +247,14 @@ def calc_tf_idf_matrix():
             else:
                 pass
 
-    # inverse document frequency
+    # Inverse document frequency
     idf_matrix = dict()
     N = len(listdir("docs"))
     for term, freq in docFreqs.items():
         idf = math.log2(N/freq)
         idf_matrix.update({term: idf})
 
-    # tf to term weights
+    # Term frequency to term weights
     for doc, content in tf_db.items():
         for term, freq in content.items():
             tf_db[doc][term] *= idf_matrix[term]
@@ -270,18 +270,18 @@ def search_tf_idf(query):
     query = lemmatize(query).split()
     cosSimMatrix = dict()
 
-    # query vector length
+    # Query vector length
     qLen = math.sqrt(len(query))
 
-    # document vectors
+    # Document vectors
     calc_tf_idf_matrix()
     for doc, content in tw_matrix.items():
-        # check if doc contains query terms:
+        # Check if doc contains query terms:
         for x in query:
             if x not in content:
                 pass
             else:
-                # calc document length
+                # Calc document length
                 dotProd = 0
                 tws = 0
                 for term, tw in content.items():
