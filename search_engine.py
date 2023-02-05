@@ -155,17 +155,18 @@ def preview_document(query, result):
         with open(f"docs/{doc}", "r") as f:
             content = f.readlines()
             for i, line in enumerate(content):
+                line = line.strip()
                 if query[0] in line:
                     try:
-                        preview.update({doc: f"{content[i-3:i+2]}..."})
-                        print(content[i])
+                        for it in range(5, 0, -1):
+                            try:
+                                preview.update({doc: f"{' '.join(content[i:i+it])}..."})
+                                break
+                            except IndexError:
+                                preview.update({doc: f"{' '.join(content[i-it:i])}..."})
+                                break
                     except IndexError:
-                        try:
-                            preview.update({doc: f"{content[i-1:i+1]}..."})
-                            print(content[i])
-                        except IndexError:
-                            preview.update({doc: f"{content[i+1]}..."})
-                            print(content[i])
+                         preview.update({doc: f"{' '.join(content)}..."})                               
     return preview
 
 
