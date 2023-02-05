@@ -25,11 +25,16 @@ def lemmatize_docs(doc_folder="docs"):
     return
 
 
-def remove_stopwords(query):
-    q = ''.join([i for i in query if (i.isalpha() is True) or (i.isspace() is True)])  # Remove interpunction
-    Nquery = [term for term in q.split() if term not in stopwords]  # Remove stopwords
+# Remove interpunction
+def clean_data(data):
+    data = ''.join([i for i in data if (i.isalpha() is True) or (i.isspace() is True)])
+    return data
 
-    return " ".join(Nquery)
+
+# Remove stopwords
+def remove_stopwords(query):
+    Nquery = ' '.join([term for term in query.split() if term not in stopwords])
+    return Nquery
 
 
 # Create a tf_indice for every document in the given folder.
@@ -53,6 +58,7 @@ def calc_term_frequency(folder="database"):
     return
 
 
+# Create incidence matrix, not including stop words
 def calc_incidence_matrix(fileLocation="database/term_incidence.csv"):
     headers = [""]
     allWords = set()
@@ -70,7 +76,7 @@ def calc_incidence_matrix(fileLocation="database/term_incidence.csv"):
 
     # Clean the data
     words = ' '.join(allWords)        
-    allWords = remove_stopwords(words).split()
+    allWords = remove_stopwords(clean_data(words)).split()
 
     for term in allWords:
         terms.append([term])
@@ -190,7 +196,7 @@ def search_bool(query, incdnceMatrix="database/term_incidence.csv", prScores="da
     vectorList = []
     relDocs = []
     result = dict()
-    query = remove_stopwords(query)
+    query = remove_stopwords(clean_data(query))
     query = lemmatize(query).split()
 
     # Create document incidence vectors
@@ -260,8 +266,8 @@ def calc_tf_idf_matrix():
 
 # Performs a tf-idf query and ranks by cosine similarity
 def search_tf_idf(query):
-    query = remove_stopwords(query)
-    query = lemmatize(remove_stopwords(query)).split()
+    query = remove_stopwords(clean_data(query))
+    query = lemmatize(query).split()
     cosSimMatrix = dict()
 
     # query vector length
