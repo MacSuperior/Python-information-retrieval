@@ -69,7 +69,7 @@
 			<div class="row">
 				<div class="col-sm-6 text-white">
 					<h1 class="display-1">Boolean Model</h1>
-          {% for doc, pr in q_res_bool.items() %}
+          {% for doc, pr in (q_res_bool.items()|list)[resStart:resEnd] %}
             <a href="/docs/{{ doc }}">
               <div class="m-3">
                 <h2 class="mt-5">{{ doc }} <span class="h6 text-dark-emphasis">({{ pr[:5] }})</span></h2>
@@ -80,7 +80,7 @@
 			</div>
 			<div class="col-sm-6 text-white">
 				<h1 class="display-1">Tf-Idf Model</h1>
-				{% for doc, cosSim in q_res_tf_idf.items() %}
+				{% for doc, cosSim in (q_res_tf_idf.items()|list)[resStart:resEnd] %}
         <a href="/docs/{{ doc }}">
 				  <div class="m-3">
 					  <h2 class="mt-5">{{ doc }} <span class="h6 text-dark-emphasis">({{ cosSim[:5] }})</span></h1>
@@ -90,6 +90,20 @@
 				{% endfor %}
 			</div>
 			</div>
+      <div class="row d-flex">
+        <div class="col">
+          <div class="btn-toolbar justify-content-center my-3" role="toolbar" aria-label="Toolbar with button groups">
+          <div class="btn-group me-2" role="group" aria-label="Button group">
+            <form action="updateresults">
+              {% for i in range(((q_res_tf_idf|length) / 5)|round|int) %}
+                <button type="submit" class="btn btn-secondary" name="pageNum" id="pageNum" value="{{ i }}">{{ i+1 }}</button>
+              {% endfor %}
+              </form>
+          </div>
+        </div>
+        </div>
+      </div>
+      
       {% endif %}
 		</div>
 		{% endif %}
