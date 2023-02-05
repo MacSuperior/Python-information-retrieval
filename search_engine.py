@@ -164,17 +164,19 @@ def preview_document(query, result):
             content = f.readlines()
             for i, line in enumerate(content):
                 line = line.strip()
-                if query[0] in line:
-                    try:
-                        for it in range(5, 0, -1):
-                            try:
-                                preview.update({doc: f"{' '.join(content[i:i+it])}..."})
-                                break
-                            except IndexError:
-                                preview.update({doc: f"{' '.join(content[i-it:i])}..."})
-                                break
-                    except IndexError:
-                         preview.update({doc: f"{' '.join(content)}..."})                               
+                for term in query:
+                    if term in line:
+                        try:
+                            for it in range(5, 0, -1):
+                                try:
+                                    preview.update({doc: f"{' '.join(content[i:i+it])}..."})
+                                    break
+                                except IndexError:
+                                    preview.update({doc: f"{' '.join(content[i-it:i])}..."})
+                                    break
+                        except IndexError:
+                            preview.update({doc: f"{' '.join(content)}..."})
+                            
     return preview
 
 
@@ -295,22 +297,34 @@ def update_database():
     calc_incidence_matrix() #depends on $tf_db
     calc_tf_idf_matrix()
     print("database updated")
+
+
 def t():
     totalWords = 0
     wordList = []
     for doc in listdir("docs"):
         with open(f"docs/{doc}") as f:
+            content = f.readlines()
             docWords = 0
-            for line in f:
-                for word in line:
+            for line in content:
+                print(line)
+                for word in line.split():
+                    print(word)
                     docWords += 1
                     totalWords += 1
             wordList.append(docWords)
             print(f"words in {doc}: {docWords}")
     print(f"words in total: {totalWords}")
+    print(max(wordList))
+    print(min(wordList))
+    print(totalWords / len(listdir("docs")))
+
+
+
 def wr():
     docNumber = 1
     for docContent in lg_doc_collection[0:201]:
         docNumber += 1
         with open(f"docs/doc{docNumber}.txt", "w") as f:
             f.writelines(docContent)
+t()
