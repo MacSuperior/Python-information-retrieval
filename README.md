@@ -11,7 +11,12 @@ It will retrieve them using two models:
 
 The system searches a collection of documents. It comes preloaded with 200 documents, on the topic of aeronautica.
 You can provide extra documents yourself, as long as these are plain text.
-To start searching, open your command line interface, navigate to the project folder and run `flask run`.
+Make sure you have the required libraries installed by:
+
+1. navigate to project  folder
+2. run `pip install -r requirements.txt`
+
+To start searching, run `flask run`.
 
 ### Example queries
 
